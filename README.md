@@ -10,6 +10,8 @@ python3 downloadBooks.py
 ```
 cmake --preset default;
 cmake --build --preset default;
+cd build
+make
 ```
 
 ## Adding files to the build
