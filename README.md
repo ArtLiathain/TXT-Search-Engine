@@ -12,6 +12,8 @@ cmake --preset default;
 cmake --build --preset default;
 cd build
 make
+cd src/
+./my_executable
 ```
 
 ## Adding files to the build
