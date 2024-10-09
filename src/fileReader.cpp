@@ -76,12 +76,12 @@ void fileReader::readFile(string fileName)
     }
 }
 
-void fileReader::getDirectories()
+Arraylist<string> fileReader::getDirectories()
 {
 
     struct dirent *entry = nullptr;
     DIR *dp = nullptr;
-
+    Arraylist<string> books = Arraylist<string>(200);
     dp = opendir("../../archive/");
     if (dp != nullptr)
     {
@@ -89,9 +89,10 @@ void fileReader::getDirectories()
         {
             string filePath = "";
             filePath += entry->d_name;
-            readFile(filePath);
+            books.add(filePath, books.length);
         }
     }
 
     closedir(dp);
+    return books;
 }
