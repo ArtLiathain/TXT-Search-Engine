@@ -2,7 +2,7 @@
 #define FILEREADER_HPP
 
 #include <iostream>
-#include "Arraylist.h"
+#include "arraylist.h"
 using namespace std;
 class fileReader
 {
@@ -12,6 +12,6 @@ public:
     fileReader(/* args */);
     ~fileReader();
     void readFile(string fileName);
-    Arraylist<string> getDirectories();
+    arraylist<string> getDirectories();
 };
 #endif FILEREADER_HPP
