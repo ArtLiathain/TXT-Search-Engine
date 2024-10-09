@@ -11,6 +11,7 @@ private:
 public:
     fileReader(/* args */);
     ~fileReader();
-    void readFile(string path);
+    void readFile(string fileName);
+    void getDirectories();
 };
 #endif FILEREADER_HPP
