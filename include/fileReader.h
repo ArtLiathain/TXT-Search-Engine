@@ -12,6 +12,6 @@ public:
     fileReader(/* args */);
     ~fileReader();
     void readFile(string fileName);
-    void getDirectories();
+    Arraylist<string> getDirectories();
 };
 #endif FILEREADER_HPP
