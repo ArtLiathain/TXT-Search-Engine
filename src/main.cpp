@@ -9,6 +9,6 @@ int main(int argc, char const *argv[])
     std::cout << temp.get(0) << "\n";
     std::cout << "Hello World" << "\n";
     fileReader reader = fileReader();
-    reader.readFile("temp");
+    reader.getDirectories();
     return 0;
 }
