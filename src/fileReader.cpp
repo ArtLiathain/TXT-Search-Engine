@@ -1,6 +1,6 @@
 #include "../include/fileReader.h"
 #include <iostream>
-#include "../include/Arraylist.h"
+#include "../include/arraylist.h"
 #include <fstream>
 #include <unordered_map>
 #include <unordered_set>
@@ -26,7 +26,6 @@ void fileReader::readFile(string fileName)
 {
     string mystring;
     ifstream file;
-    cout<<"../../archive/" + fileName << "\n";
     file.open("../../archive/" + fileName);
 
     unordered_map<string, int> wordMap;
@@ -50,24 +49,8 @@ void fileReader::readFile(string fileName)
             {
                 continue;
             }
-
-            if (wordMap.count(mystring))
-            {
-                wordMap[mystring] += 1;
-            }
-            else
-            {
-                wordMap[mystring] = 1;
-            }
+            wordMap[mystring] += 1;
             count++;
-        }
-        for (auto x : wordMap)
-        {
-            if (x.second < 1000)
-            {
-                continue;
-            }
-            cout << x.first << " " << (float)x.second << "\n";
         }
     }
     else
@@ -76,12 +59,12 @@ void fileReader::readFile(string fileName)
     }
 }
 
-Arraylist<string> fileReader::getDirectories()
+arraylist<string> fileReader::getDirectories()
 {
 
     struct dirent *entry = nullptr;
     DIR *dp = nullptr;
-    Arraylist<string> books = Arraylist<string>(200);
+    arraylist<string> books = arraylist<string>(200);
     dp = opendir("../../archive/");
     if (dp != nullptr)
     {
@@ -89,7 +72,7 @@ Arraylist<string> fileReader::getDirectories()
         {
             string filePath = "";
             filePath += entry->d_name;
-            books.add(filePath, books.length);
+            books.insert(filePath);
         }
     }
 
