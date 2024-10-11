@@ -31,11 +31,12 @@ void Arraylist<T>::add(T value, int index)
 {
     if (length >= capacity)
     {
-        int *newArray = new int[capacity * 2];
-        for (int i = 0; i < capacity; i++)
+        T *newArray = new T[capacity * 2];
+        for (int i = 0; i < length; i++)
         {
             newArray[i] = array[i];
         }
+        delete[] array;
         capacity *= 2;
         array = newArray;
     }
@@ -66,13 +67,13 @@ T Arraylist<T>::get(int index)
     {
         return array[index];
     }
-    return -1;
+    throw std::out_of_range("Index out of bounds");
 }
 
 template <typename T>
 Arraylist<T>::~Arraylist()
 {
-    free(array);
+    delete[] array;
 }
 
 #endif
