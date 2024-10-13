@@ -35,16 +35,16 @@ struct Value
 };
 
 // Structure to hold key-value pairs
-template <typename K, typename T>
+template <typename K, typename V>
 struct KeyValue
 {
     K key;
-    optional<T> value;
+    optional<V> value;
 
     KeyValue() : key(""), value(nullopt) {}
 };
 
-template <typename K, typename T>
+template <typename K, typename V>
 class hashmap
 {
 private:
@@ -59,47 +59,47 @@ private:
     int hashKey(int function, const K &key);
 
 public:
-    KeyValue<K, T> **hashtable;
+    KeyValue<K, V> **hashtable;
     hashmap();
     hashmap(int n);
     ~hashmap();
     void initTable();
-    void add(const K &key, const T &value, int tableID, int cnt, int n);
-    void add(const K &key, const T &value);
-    T getValue(const K &key);
+    void add(const K &key, const V &value, int tableID, int cnt, int n);
+    void add(const K &key, const V &value);
+    V getValue(const K &key);
     void printTable();
-    void createHashTable(arraylist<pair<K, T>> &keyValuePairs);
+    void createHashTable(arraylist<pair<K, V>> &keyValuePairs);
 };
 
 
-template <typename K, typename T>
-hashmap<K, T>::hashmap(int n)
+template <typename K, typename V>
+hashmap<K, V>::hashmap(int n)
 {
     static_assert(std::is_convertible<K, std::string>::value, 
             "Key type K must be derived from or convertible to std::string");
     MAXN = n;
     ver = 2;
     pos = new int[ver];
-    hashtable = new KeyValue<K, T>*();
+    hashtable = new KeyValue<K, V>*();
     initTable();
 }
 
-template <typename K, typename T>
-hashmap<K, T>::hashmap()
+template <typename K, typename V>
+hashmap<K, V>::hashmap()
 {
     static_assert(std::is_convertible<K, std::string>::value, 
             "Key type K must be derived from or convertible to std::string");
     MAXN = 1;
     ver = 2;
     pos = new int[ver];
-    hashtable = new KeyValue<K, T>*();
+    hashtable = new KeyValue<K, V>*();
     initTable();
 }
 
 /* Function to retrieve the value associated with a key
  * key: Which key's value we want to retrieve */
-template <typename K, typename T>
-T hashmap<K, T>::getValue(const K &key)
+template <typename K, typename V>
+V hashmap<K, V>::getValue(const K &key)
 {
     for (int i = 0; i < ver; i++)
     {
@@ -109,7 +109,7 @@ T hashmap<K, T>::getValue(const K &key)
             return hashtable[i][index].value.value();
         }
     }
-    return T();
+    return V();
 }
 
 /* function to place a key-value pair in one of its possible positions
@@ -118,8 +118,8 @@ T hashmap<K, T>::getValue(const K &key)
  * tableID: Which version of the table the key is being inserted into
  * cnt: Number of displacements
  * n: Amount of elements */
-template <typename K, typename T>
-void hashmap<K, T>::add(const K &key, const T &value, int tableID, int cnt, int n)
+template <typename K, typename V>
+void hashmap<K, V>::add(const K &key, const V &value, int tableID, int cnt, int n)
 {
     if (cnt == n)
     {
@@ -143,7 +143,7 @@ void hashmap<K, T>::add(const K &key, const T &value, int tableID, int cnt, int 
     if (hashtable[tableID][pos[tableID]].value.has_value())
     {
         K displacedKey = hashtable[tableID][pos[tableID]].key;
-        T displacedValue = hashtable[tableID][pos[tableID]].value.value();
+        V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
         hashtable[tableID][pos[tableID]].key = key;
         hashtable[tableID][pos[tableID]].value = value;
@@ -157,8 +157,8 @@ void hashmap<K, T>::add(const K &key, const T &value, int tableID, int cnt, int 
     }
 }
 
-template <typename K, typename T>
-void hashmap<K, T>::add(const K &key, const T &value)
+template <typename K, typename V>
+void hashmap<K, V>::add(const K &key, const V &value)
 {
     int tableID = 0;
     int cnt = 0;
@@ -185,7 +185,7 @@ void hashmap<K, T>::add(const K &key, const T &value)
     if (hashtable[tableID][pos[tableID]].value.has_value())
     {
         K displacedKey = hashtable[tableID][pos[tableID]].key;
-        T displacedValue = hashtable[tableID][pos[tableID]].value.value();
+        V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
         hashtable[tableID][pos[tableID]].key = key;
         hashtable[tableID][pos[tableID]].value = value;
@@ -201,8 +201,8 @@ void hashmap<K, T>::add(const K &key, const T &value)
 
 /* function to create a hashtable from an array list
  * &keyValuePairs: Vector of key value pairs received from text rank to take in as input*/
-template <typename K, typename T>
-void hashmap<K, T>::createHashTable(arraylist<pair<K, T>> &keyValuePairs)
+template <typename K, typename V>
+void hashmap<K, V>::createHashTable(arraylist<pair<K, V>> &keyValuePairs)
 {
     int n = keyValuePairs.length;
 
@@ -215,8 +215,8 @@ void hashmap<K, T>::createHashTable(arraylist<pair<K, T>> &keyValuePairs)
 }
 
 /* function to print hash table contents */
-template <typename K, typename T>
-void hashmap<K, T>::printTable()
+template <typename K, typename V>
+void hashmap<K, V>::printTable()
 {
     printf("Final hash tables:\n");
     for (int i = 0; i < ver; i++, printf("\n"))
@@ -233,13 +233,13 @@ void hashmap<K, T>::printTable()
 }
 
 /* function to fill hash table with dummy values for initialisation */
-template <typename K, typename T>
-void hashmap<K, T>::initTable()
+template <typename K, typename V>
+void hashmap<K, V>::initTable()
 {
-    hashtable = new KeyValue<K, T>*[ver]; // Allocate rows for 'ver' tables
+    hashtable = new KeyValue<K, V>*[ver]; // Allocate rows for 'ver' tables
     for (int i = 0; i < ver; i++)
     {
-        hashtable[i] = new KeyValue<K, T>[MAXN]; // Allocate columns based on MAXN
+        hashtable[i] = new KeyValue<K, V>[MAXN]; // Allocate columns based on MAXN
         for (int j = 0; j < MAXN; j++)
         {
             hashtable[i][j].value = nullopt; // Initialize to default
@@ -250,8 +250,8 @@ void hashmap<K, T>::initTable()
 /* Simple hash function for strings
  * function: Which version of the hash function we want to use
  * &key: Reference to the keyword being hashed*/
-template <typename K, typename T>
-int hashmap<K, T>::hashKey(int function, const K &key)
+template <typename K, typename V>
+int hashmap<K, V>::hashKey(int function, const K &key)
 {
     int hashValue = 0;
     if (function == 1)
@@ -276,16 +276,16 @@ int hashmap<K, T>::hashKey(int function, const K &key)
     }
 }
 
-template <typename K, typename T>
-void hashmap<K, T>::rehash() {
+template <typename K, typename V>
+void hashmap<K, V>::rehash() {
     int oldMAXN = MAXN; // Save the old size
     MAXN *= 2; // Double the size
-    KeyValue<K, T>** oldTable = hashtable; // Keep reference to old table
+    KeyValue<K, V>** oldTable = hashtable; // Keep reference to old table
 
     // Initialize new hashtable
-    hashtable = new KeyValue<K, T>*[ver];
+    hashtable = new KeyValue<K, V>*[ver];
     for (int i = 0; i < ver; i++) {
-        hashtable[i] = new KeyValue<K, T>[MAXN];
+        hashtable[i] = new KeyValue<K, V>[MAXN];
         for (int j = 0; j < MAXN; j++) {
             hashtable[i][j].value = nullopt; // Initialize to nullopt
         }
@@ -296,7 +296,7 @@ void hashmap<K, T>::rehash() {
         for (int j = 0; j < oldMAXN; j++) {
             if (oldTable[i][j].value.has_value()) { // Only rehash if there is a value
                 const K &key = oldTable[i][j].key;
-                const T &value = oldTable[i][j].value.value();
+                const V &value = oldTable[i][j].value.value();
 
                 // Use the add function to insert the key-value pair into the new table
                 add(key, value, i, 0, oldMAXN); // Insert into the new hashtable
@@ -307,8 +307,8 @@ void hashmap<K, T>::rehash() {
     delete[] oldTable; // Clean up old table
 }
 
-template <typename K, typename T>
-hashmap<K, T>::~hashmap() {
+template <typename K, typename V>
+hashmap<K, V>::~hashmap() {
     for (int i = 0; i < ver; i++) {
         delete[] hashtable[i]; // Delete each row
     }
