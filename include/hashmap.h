@@ -62,7 +62,6 @@ public:
     KeyValue<K, T> **hashtable;
     hashmap();
     hashmap(int n);
-    hashmap(int n, int hash_versions);
     ~hashmap();
     void initTable();
     void add(const K &key, const T &value, int tableID, int cnt, int n);
@@ -72,19 +71,6 @@ public:
     void createHashTable(arraylist<pair<K, T>> &keyValuePairs);
 };
 
-template <typename K, typename T>
-hashmap<K, T>::hashmap(int n, int hash_versions)
-{
-    // TODO: Decide if this is sufficient or should I edit the hashkey code to allow for other types of keys
-    // Throw an error if key type is not convertable to a string
-    static_assert(std::is_convertible<K, std::string>::value, 
-            "Key type K must be derived from or convertible to std::string");
-    MAXN = n;
-    ver = hash_versions;
-    pos = new int[ver];
-    hashtable = new KeyValue<K, T>*();
-    initTable();
-}
 
 template <typename K, typename T>
 hashmap<K, T>::hashmap(int n)

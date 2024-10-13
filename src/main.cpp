@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     keyValuePairs.insert(make_pair("Strawberry", Value{5, "Book C"}));
     keyValuePairs.insert(make_pair("Orange", Value{3, "Book D"}));
     keyValuePairs.insert(make_pair("Grapes", Value{7, "Book E"}));
-    hashmap<string, Value> map = hashmap<string, Value>(keyValuePairs.length, 2);
+    hashmap<string, Value> map = hashmap<string, Value>(keyValuePairs.length);
     map.createHashTable(keyValuePairs);
     std::cout << "Apple found in " << map.getValue("Apple").book << " " << map.getValue("Apple").count << " times" << endl;
     std::cout << "Dog found in " << map.getValue("Dog").book << " " << map.getValue("Dog").count << " times" << endl;
@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
     std::cout << "Dog found " << map2.getValue("Dog") << " times" << endl;
 
     // This currently throws a segmentation fault at the end of the run as it tries deleting map2 twice. Once when deleting doublemap and once when deleting map2
-    // hashmap<string, hashmap<string, int>> doublemap = hashmap<string, hashmap<string, int>>(2, 2);
+    // hashmap<string, hashmap<string, int>> doublemap = hashmap<string, hashmap<string, int>>(2);
     // doublemap.add("Apple", &map2);
     // std::cout << "Apple found in double layer map " << doublemap.getValue("Apple").getValue("Apple") << " times" << endl;
     // std::cout << "Dog found in double layer map " << doublemap.getValue("Dog").getValue("Dog") << " times" << endl;
