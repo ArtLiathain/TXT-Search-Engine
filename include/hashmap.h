@@ -41,8 +41,8 @@ public:
     stringhashmap(int n);
     ~stringhashmap();
     void initTable();
-    void add(const string &key, const V &value, int tableID, int cnt, int n);
-    void add(const string &key, const V &value);
+    void insert(const string &key, const V &value, int tableID, int cnt, int n);
+    void insert(const string &key, const V &value);
     void remove(const string &key);
     V getValue(const string &key);
     arraylist<string> getAllKeys();
@@ -94,14 +94,14 @@ V stringhashmap<V>::getValue(const string &key)
  * cnt: Number of displacements
  * n: Amount of elements */
 template <typename V>
-void stringhashmap<V>::add(const string &key, const V &value, int tableID, int cnt, int n)
+void stringhashmap<V>::insert(const string &key, const V &value, int tableID, int cnt, int n)
 {
     if (cnt == n)
     {
         printf("%s unpositioned\n", key.c_str());
         printf("Cycle present. REHASH.\n");
         rehash();
-        add(key, value, tableID, cnt, n*2);
+        insert(key, value, tableID, cnt, n*2);
         return;
     }
 
@@ -123,7 +123,7 @@ void stringhashmap<V>::add(const string &key, const V &value, int tableID, int c
         hashtable[tableID][pos[tableID]].key = key;
         hashtable[tableID][pos[tableID]].value = value;
 
-        add(displacedKey, displacedValue, (tableID + 1) % ver, cnt + 1, n);
+        insert(displacedKey, displacedValue, (tableID + 1) % ver, cnt + 1, n);
     }
     else
     {
@@ -132,14 +132,14 @@ void stringhashmap<V>::add(const string &key, const V &value, int tableID, int c
     }
 }
 
-/* Function to add a key value pair to the hashmap
+/* Function to insert a key value pair to the hashmap
 Checks if the 1st hash tables version is occupied for the hash of the key
 and if it is pushes that kvp to its 2nd hash table location
- * key - the key we want to add, as a string
+ * key - the key we want to insert, as a string
  * value - the value associated with that key
 */
 template <typename V>
-void stringhashmap<V>::add(const string &key, const V &value)
+void stringhashmap<V>::insert(const string &key, const V &value)
 {
     int tableID = 0;
     int cnt = 0;
@@ -149,7 +149,7 @@ void stringhashmap<V>::add(const string &key, const V &value)
         printf("%s unpositioned\n", key.c_str());
         printf("Cycle present. REHASH.\n");
         rehash();
-        add(key, value);
+        insert(key, value);
         return;
     }
 
@@ -173,7 +173,7 @@ void stringhashmap<V>::add(const string &key, const V &value)
         hashtable[tableID][pos[tableID]].key = key;
         hashtable[tableID][pos[tableID]].value = value;
 
-        add(displacedKey, displacedValue, (tableID + 1) % ver, cnt + 1, n);
+        insert(displacedKey, displacedValue, (tableID + 1) % ver, cnt + 1, n);
     }
     else
     {
@@ -191,7 +191,7 @@ void stringhashmap<V>::createHashTable(arraylist<pair<string, V>> &keyValuePairs
 
     for (int i = 0; i < n; i++)
     {
-        add(keyValuePairs.get(i).first, keyValuePairs.get(i).second, 0, 0, n);
+        insert(keyValuePairs.get(i).first, keyValuePairs.get(i).second, 0, 0, n);
     }
 
     printTable();
@@ -310,8 +310,8 @@ void stringhashmap<V>::rehash() {
                 const string &key = oldTable[i][j].key;
                 const V &value = oldTable[i][j].value.value();
 
-                // Use the add function to insert the key-value pair into the new table
-                add(key, value, i, 0, oldMAXN); // Insert into the new hashtable
+                // Use the insert function to insert the key-value pair into the new table
+                insert(key, value, i, 0, oldMAXN); // Insert into the new hashtable
             }
         }
         delete[] oldTable[i]; // Clean up old table row
