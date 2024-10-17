@@ -13,6 +13,6 @@ public:
     fileReader(/* args */);
     ~fileReader();
     void readFile(string fileName, unordered_map<string, arraylist<pair<string, float>>>* wordIndex);
-    arraylist<string> getDirectories();
+    arraylist<string> getBooks();
 };
 #endif FILEREADER_HPP

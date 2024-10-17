@@ -72,7 +72,7 @@ void fileReader::readFile(string fileName, unordered_map<string, arraylist<pair<
     }
 }
 
-arraylist<string> fileReader::getDirectories()
+arraylist<string> fileReader::getBooks()
 {
 
     struct dirent *entry = nullptr;

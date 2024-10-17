@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "arraylist.h"
+
 using namespace std;
 
 class searchIndex
