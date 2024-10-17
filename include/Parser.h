@@ -40,7 +40,6 @@ public:
     void searchBook();
 
 
-
 private:
     // Internal Option structure
     struct Option {
@@ -89,12 +88,5 @@ std::string Parser::toString(const T& value) const {
     return oss.str();
 }
 
-template<typename T>
-T Parser::fromString(const std::string& str) const {
-    std::istringstream iss(str);
-    T value;
-    iss >> value;
-    return value;
-}
 
 #endif // PARSER_H

@@ -31,8 +31,20 @@ void Parser::parse(int argc, const char* argv[]) {
             if (options.find(name) != options.end()) {
                 if (options[name].isFlag) {
                     options[name].value = "true"; // it's a flag, set to true
-                } else if (i + 1 < argc) {
-                    options[name].value = argv[++i]; // set option value
+                } 
+                else if (name == "search") {
+                    // Capture all words after -search until the next option
+                    std::string searchValue;
+                    while (i + 1 < argc && argv[i + 1][0] != '-') {
+                        searchValue += argv[++i];
+                        searchValue += " ";
+                        
+                    }
+                    options[name].value = Parser::toString(searchValue);
+                    std::cout << "searchValue: " << searchValue << std::endl;
+                }
+                else if (i + 1 < argc) {
+                    options[name].value = argv[++i]; // Set regular option value
                 }
                 options[name].inCLI = true;
             } else {
@@ -69,4 +81,20 @@ void Parser::listBooks() {
 
 void Parser::searchBook() {
     std::cout << "Searching for book: " << Parser::getOption<std::string>("search") << std::endl;
+}
+
+
+// Convert any type to string
+template<typename T>
+T Parser::fromString(const std::string& str) const {
+    std::istringstream iss(str);
+    T value;
+    iss >> value; // For types like int, double, etc., this will work fine
+    return value;
+}
+
+// Specialization for std::string
+template<>
+std::string Parser::fromString<std::string>(const std::string& str) const {
+    return str; // Just return the full string as is
 }
