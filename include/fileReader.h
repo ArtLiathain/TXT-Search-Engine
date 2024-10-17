@@ -1,5 +1,6 @@
 #ifndef FILEREADER_HPP
 #define FILEREADER_HPP
+#include <unordered_map>
 
 #include <iostream>
 #include "arraylist.h"
@@ -11,7 +12,7 @@ private:
 public:
     fileReader(/* args */);
     ~fileReader();
-    void readFile(string fileName);
+    void readFile(string fileName, unordered_map<string, arraylist<pair<string, float>>>* wordIndex);
     arraylist<string> getDirectories();
 };
 #endif FILEREADER_HPP

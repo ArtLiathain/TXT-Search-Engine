@@ -2,7 +2,6 @@
 #include <iostream>
 #include "../include/arraylist.h"
 #include <fstream>
-#include <unordered_map>
 #include <unordered_set>
 #include <stdio.h>
 #include <dirent.h>
@@ -22,7 +21,7 @@ fileReader::~fileReader()
 {
 }
 
-void fileReader::readFile(string fileName)
+void fileReader::readFile(string fileName, unordered_map<string, arraylist<pair<string, float>>> *wordIndex)
 {
     string mystring;
     ifstream file;
@@ -51,6 +50,20 @@ void fileReader::readFile(string fileName)
             }
             wordMap[mystring] += 1;
             count++;
+        }
+
+        for (auto x : wordMap)
+        {
+            if (wordIndex->count(x.first))
+            {
+                (*wordIndex)[x.first].insert(make_pair(fileName, (float)x.second/count));
+            }
+            else
+            {
+                arraylist<pair<string, float>> tempArrList(200);
+                tempArrList.insert(make_pair(fileName, (float)x.second/count));
+                (*wordIndex)[x.first] = std::move(tempArrList);
+            }
         }
     }
     else
