@@ -10,6 +10,9 @@ private:
 
 public:
     arraylist(int _capacity);
+    arraylist();
+    arraylist(const arraylist<T>& other);
+    arraylist& operator=(const arraylist<T>& other);
     ~arraylist();
     int capacity;
     int length;
@@ -18,6 +21,48 @@ public:
     void remove(int index);
     T get(int index);
 };
+
+template <typename T>
+arraylist<T>::arraylist()
+{
+    capacity = 100;
+    array = new T[capacity];
+    length = 0;
+}
+
+
+template <typename T>
+arraylist<T>::arraylist(const arraylist<T>& other)
+{
+    capacity = other.capacity;
+    length = other.length;
+    array = new T[capacity];
+    for (int i = 0; i < length; ++i)
+    {
+        array[i] = other.array[i];
+    }
+}
+
+template <typename T>
+arraylist<T>& arraylist<T>::operator=(const arraylist<T>& other)
+{
+    if (this == &other) 
+        return *this;
+
+
+    delete[] array;
+
+
+    capacity = other.capacity;
+    length = other.length;
+    array = new T[capacity];
+    for (int i = 0; i < length; ++i)
+    {
+        array[i] = other.array[i];
+    }
+
+    return *this;
+}
 
 template <typename T>
 arraylist<T>::arraylist(int _capacity)
