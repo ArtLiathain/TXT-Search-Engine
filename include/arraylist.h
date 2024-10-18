@@ -3,14 +3,14 @@
 #include <iostream>
 
 template <typename T>
-class Arraylist
+class arraylist
 {
 private:
     T *array;
 
 public:
-    Arraylist(int _capacity);
-    ~Arraylist();
+    arraylist(int _capacity);
+    ~arraylist();
     int capacity;
     int length;
     void insert(T value);
@@ -20,7 +20,7 @@ public:
 };
 
 template <typename T>
-Arraylist<T>::Arraylist(int _capacity)
+arraylist<T>::arraylist(int _capacity)
 {
     array = new T[_capacity];
     length = 0;
@@ -28,7 +28,7 @@ Arraylist<T>::Arraylist(int _capacity)
 }
 
 template <typename T>
-void Arraylist<T>::insert(T value, int index)
+void arraylist<T>::insert(T value, int index)
 {
     if(index >= capacity || index >= length){
         throw std::out_of_range("Index out of bounds");
@@ -54,7 +54,7 @@ void Arraylist<T>::insert(T value, int index)
 }
 
 template <typename T>
-void Arraylist<T>::insert(T value)
+void arraylist<T>::insert(T value)
 {
     if (length >= capacity)
     {
@@ -72,7 +72,7 @@ void Arraylist<T>::insert(T value)
 }
 
 template <typename T>
-void Arraylist<T>::remove(int index)
+void arraylist<T>::remove(int index)
 {
     if (length == 0 && index -1 > length)
     {
@@ -86,7 +86,7 @@ void Arraylist<T>::remove(int index)
 }
 
 template <typename T>
-T Arraylist<T>::get(int index)
+T arraylist<T>::get(int index)
 {
     if (index >= 0 && index < length)
     {
@@ -96,7 +96,7 @@ T Arraylist<T>::get(int index)
 }
 
 template <typename T>
-Arraylist<T>::~Arraylist()
+arraylist<T>::~arraylist()
 {
     delete[] array;
 }
