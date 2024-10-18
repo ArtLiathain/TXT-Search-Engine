@@ -8,64 +8,63 @@ searchIndex::~searchIndex()
 {
 }
 
-void searchIndex::andFunc(string word, unordered_map<string, float> *searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex)
+void searchIndex::andFunc(unordered_map<string, float>* searchValue, arraylist<pair<string, float>> *wordArray)
 {
-    if (!wordIndex->count(word))
+    if (wordArray->length == 0)
     {
         (*searchValue).clear();
         return;
     }
-    arraylist<pair<string, float>> booksContainingWord = (*wordIndex)[word];
     unordered_map<string, float> newsearchValue;
 
-    for (int j = 0; j < booksContainingWord.length; j++)
+    for (int j = 0; j < wordArray->length; j++)
     {
-        string book = booksContainingWord.get(j).first;
+        string book = wordArray->get(j).first;
         if (searchValue->count(book))
         {
-            newsearchValue[book] = (*searchValue)[book] + booksContainingWord.get(j).second;
+            newsearchValue[book] = (*searchValue)[book] + wordArray->get(j).second;
         }
     }
     *searchValue = newsearchValue;
 }
 
-void searchIndex::orFunc(string word, unordered_map<string, float> *searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex)
+void searchIndex::orFunc(unordered_map<string, float>* searchValue, arraylist<pair<string, float>> *wordArray)
 {
-    if (!wordIndex->count(word))
+    if (wordArray->length == 0)
     {
         return;
     }
-    arraylist<pair<string, float>> booksContainingWord = (*wordIndex)[word];
 
-    for (int j = 0; j < booksContainingWord.length; j++)
+    for (int j = 0; j < wordArray->length; j++)
     {
-        string book = booksContainingWord.get(j).first;
+        string book = wordArray->get(j).first;
         if (searchValue->count(book))
         {
-            (*searchValue)[book] += booksContainingWord.get(j).second;
+            (*searchValue)[book] += wordArray->get(j).second;
         }
         else {
-            (*searchValue)[book] = booksContainingWord.get(j).second;
+            (*searchValue)[book] = wordArray->get(j).second;
         }
     }
 }
 
-void searchIndex::notFunc(string word, unordered_map<string, float> *searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex)
+arraylist<pair<string, float>> searchIndex::notFunc(arraylist<pair<string, float>> *wordArray)
 {
-    if (!wordIndex->count(word))
-    {
-        return;
+    fileReader reader = fileReader();
+    arraylist<string> books = reader.getBooks();
+    unordered_map<string, float> booksWithoutTheWord;
+    for (int i = 0; i < books.length; i++){
+        booksWithoutTheWord[books.get(i)] = 0.0;
     }
+    for (int j = 0; j < wordArray->length; j++){
+        
+        booksWithoutTheWord.erase(wordArray->get(j).first);
+    }
+    arraylist<pair<string,float>> arrayBooksWithoutTheWord;
+    for (auto x : booksWithoutTheWord){
+        arrayBooksWithoutTheWord.insert(pair(x.first, 0));
+    }
+    return arrayBooksWithoutTheWord;
+
     
-
-    arraylist<pair<string, float>> booksContainingWord = (*wordIndex)[word];
-
-    for (int j = 0; j < booksContainingWord.length; j++)
-    {
-        string book = booksContainingWord.get(j).first;
-        if (searchValue->count(book))
-        {
-            searchValue->erase(book);
-        }
-    }
 }

@@ -1,10 +1,5 @@
 #include "../include/fileReader.h"
-#include <iostream>
-#include "../include/arraylist.h"
-#include <fstream>
-#include <unordered_set>
-#include <stdio.h>
-#include <dirent.h>
+
 using namespace std;
 
 unordered_set<string> stopWords;

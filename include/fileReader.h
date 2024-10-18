@@ -1,7 +1,11 @@
 #ifndef FILEREADER_HPP
 #define FILEREADER_HPP
 #include <unordered_map>
-
+#include <iostream>
+#include <fstream>
+#include <unordered_set>
+#include <stdio.h>
+#include <dirent.h>
 #include <iostream>
 #include "arraylist.h"
 using namespace std;

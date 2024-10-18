@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "arraylist.h"
+#include "fileReader.h"
 
 using namespace std;
 
@@ -14,8 +15,8 @@ private:
 public:
     searchIndex(/* args */);
     ~searchIndex();
-    void orFunc(string word, unordered_map<string, float>* searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex);
-    void andFunc(string word, unordered_map<string, float>* searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex);
-    void notFunc(string word, unordered_map<string, float>* searchValue, unordered_map<string, arraylist<pair<string, float>>> *wordIndex);
+    void orFunc(unordered_map<string, float>* searchValue, arraylist<pair<string, float>> *wordArray);
+    void andFunc(unordered_map<string, float>* searchValue, arraylist<pair<string, float>> *wordArray);
+    arraylist<pair<string, float>> notFunc(arraylist<pair<string, float>> *wordArray);
 };
 #endif SEARCHINDEX_HPP
