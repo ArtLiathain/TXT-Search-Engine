@@ -1,9 +1,30 @@
 #include <iostream>
+#include "../include/trie.h"
+#include "../include/Arraylist.h"
+using namespace std;
 #include "../include/LinkedList.h"
 #include "../include/Parser.h"
 
 int main(int argc, char const *argv[])
 {
+    trie autoComplete;
+    
+    autoComplete.insert("Kiki");
+    autoComplete.insert("Kiiiiiiidi");
+    autoComplete.insert("Cookie");
+
+    Arraylist<string> trieValues = autoComplete.getArrayList();
+
+    for(int i = 0; i < trieValues.length; i++){
+        cout << trieValues.get(i) << "\n";
+    }
+
+    Arraylist<string> trieValuess = autoComplete.getArrayList_withPrefix("Ki");
+
+    for(int i = 0; i < trieValuess.length; i++){
+        cout << trieValuess.get(i) << "\n";
+    }
+
     // LinkedList<int>  temp;
     // temp.add(5);
     // std::cout << temp.get(0) << "\n";
@@ -19,7 +40,7 @@ int main(int argc, char const *argv[])
 
     // Check the flags and output their status
     if (parser.checkOption("verbose")) {
-        std::cout << "Verbose mode is enabled." << std::endl;
+        cout << "Verbose mode is enabled." << endl;
     }
     if (parser.checkOption("help")) {
         parser.printHelp(); // Display help

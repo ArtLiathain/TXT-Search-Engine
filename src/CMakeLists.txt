@@ -1,5 +1,6 @@
 set(SOURCE_FILES
     main.cpp
+    trie.cpp
     Parser.cpp
 )
 add_executable(my_executable ${SOURCE_FILES})
