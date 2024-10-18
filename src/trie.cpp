@@ -38,9 +38,9 @@ void trie::insert(string word)
     cur->endOfWord = true;
 }
 
-Arraylist<string> trie::getArrayList()
+arraylist<string> trie::getArrayList()
 {
-    Arraylist<string> result = Arraylist<string>(10);
+    arraylist<string> result = arraylist<string>(10);
     Node *cur = root;
     for (auto x : cur->children)
     {
@@ -49,12 +49,12 @@ Arraylist<string> trie::getArrayList()
     return result;
 }
 
-Arraylist<string> trie::getArrayList_withPrefix(string prefix)
+arraylist<string> trie::getArrayList_withPrefix(string prefix)
 {
     for (int j = 0; j < prefix.length(); j++){
         prefix[j] = tolower(prefix[j]);
     }
-    Arraylist<string> result = Arraylist<string>(10);
+    arraylist<string> result = arraylist<string>(10);
     Node *cur = root;
     for (auto x : cur->children)
     {
@@ -63,7 +63,7 @@ Arraylist<string> trie::getArrayList_withPrefix(string prefix)
     return result;
 }
 
-void trie::getArrayList_rec(unordered_map<std::string, Node *> children, string prefix, Arraylist<string> *result)
+void trie::getArrayList_rec(unordered_map<std::string, Node *> children, string prefix, arraylist<string> *result)
 {
     for (auto x : children)
     {

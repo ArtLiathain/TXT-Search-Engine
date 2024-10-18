@@ -2,7 +2,7 @@
 #define TRIE_H
 #include <unordered_map>
 #include <iostream>
-#include "../include/Arraylist.h"
+#include "../include/arraylist.h"
 using namespace std;
 
 class trie
@@ -21,9 +21,9 @@ public:
     void insert(std::string value);
     trie(/* args */);
     ~trie();
-    Arraylist<string> getArrayList();
-    Arraylist<string> getArrayList_withPrefix(string prefix);
-    void getArrayList_rec(unordered_map<std::string, Node *> children,string prefix ,Arraylist<string> * result);
+    arraylist<string> getArrayList();
+    arraylist<string> getArrayList_withPrefix(string prefix);
+    void getArrayList_rec(unordered_map<std::string, Node *> children,string prefix ,arraylist<string> * result);
 };
 
 #endif
