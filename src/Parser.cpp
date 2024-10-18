@@ -41,9 +41,8 @@ void Parser::parse(int argc, const char* argv[]) {
                         
                     }
                     options[name].value = Parser::toString(searchValue);
-                    std::cout << "searchValue: " << searchValue << std::endl;
                 }
-                else if (i + 1 < argc) {
+                else if (i + 1 < argc && argv[i + 1][0] != '-') {
                     options[name].value = argv[++i]; // Set regular option value
                 }
                 options[name].inCLI = true;
