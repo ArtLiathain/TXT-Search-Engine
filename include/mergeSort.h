@@ -4,15 +4,17 @@
 using namespace std;
 class mergeSort
 {
-private:
-    /* data */
-    arraylist<int> merge(arraylist<int> array1, arraylist<int> array2);
-    arraylist<int> breakUp(arraylist<int> array, int low, int high);
+
 public:
-    mergeSort(/* args */);
+    mergeSort();
     ~mergeSort();
-    
-    arraylist<int> sortArray(arraylist<int> array);
+
+    arraylist<pair<string, float>> sortArray(arraylist<pair<string, float>> array);
+
+private:
+
+    arraylist<pair<string, float>> merge(arraylist<pair<string, float>>  array1, arraylist<pair<string, float>>  array2);
+    arraylist<pair<string, float>>  breakUp(arraylist<pair<string, float>> array, int low, int high);
 };
 
 #endif MERGESORT_HPP
