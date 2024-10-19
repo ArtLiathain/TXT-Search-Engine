@@ -3,6 +3,8 @@
 add_executable(
   arraylist_test
   arraylist_test.cc
+  hashmap_test
+  hashmap_test.cc
 )
 target_link_libraries(
   arraylist_test
