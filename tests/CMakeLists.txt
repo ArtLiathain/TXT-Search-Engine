@@ -8,8 +8,20 @@ target_link_libraries(
   arraylist_test
   GTest::gtest_main
 )
+
 gtest_discover_tests(arraylist_test)
 
+add_executable(
+  trie_test
+  trie_test.cc
+  ../src/trie.cpp
+)
+target_link_libraries(
+  trie_test
+  GTest::gtest_main
+)
+
+gtest_discover_tests(trie_test)
 
 add_executable(
   searchIndex_test

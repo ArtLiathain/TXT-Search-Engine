@@ -1,5 +1,6 @@
 set(SOURCE_FILES
     main.cpp
+    trie.cpp
     fileReader.cpp
     mergeSort.cpp
     searchIndex.cpp

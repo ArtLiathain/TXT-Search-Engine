@@ -1,5 +1,6 @@
 set(HEADER_FILES
     LinkedList.h
+    trie.h
     fileReader.h
     searchIndex.h
     hashmap.h

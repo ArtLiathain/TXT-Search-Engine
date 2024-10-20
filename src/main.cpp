@@ -1,10 +1,11 @@
 #include <iostream>
+#include "../include/arraylist.h"
 #include "../include/fileReader.h"
 #include "../include/hashmap.h"
 using namespace std;
+
 int main(int argc, char const *argv[])
 {
-    
     auto startread = std::chrono::high_resolution_clock::now();
     fileReader reader = fileReader();
     arraylist<string> books = reader.getBooks();
