@@ -3,6 +3,7 @@
 
 #include <bits/stdc++.h>
 #include "./arraylist.h"
+#include "./serialiseArraylist.h"
 #include <optional>
 
 #include <vector>
@@ -42,22 +43,26 @@ public:
     KeyValue<string, V> **hashtable;
     stringhashmap();
     stringhashmap(int n);
-    ~stringhashmap();
+    stringhashmap(const stringhashmap<V> &other);
+    stringhashmap(stringhashmap<V> &&other) noexcept;
+    ~stringhashmap() noexcept;
     void initTable();
     void insert(const string &key, const V &value, int tableID, int cnt, int n);
     void insert(const string &key, const V &value);
     void remove(const string &key);
     V getValue(const string &key);
     arraylist<string> getAllKeys();
-    void printTable();
     void createHashTable(arraylist<pair<string, V>> &keyValuePairs);
+    void serialize(const string &filename);
+    static stringhashmap<V> deserialize(const string &filename);
+    stringhashmap<V>& operator=(const stringhashmap<V> &other);
+    stringhashmap<V>& operator=(stringhashmap<V> &&other) noexcept;
 };
 
-
 template <typename V>
-stringhashmap<V>::stringhashmap(int n)
+stringhashmap<V>::stringhashmap()
 {
-    MAXN = n;
+    MAXN = 2;
     ver = 2;
     pos = new int[ver];
     hashtable = new KeyValue<string, V>*();
@@ -65,13 +70,103 @@ stringhashmap<V>::stringhashmap(int n)
 }
 
 template <typename V>
-stringhashmap<V>::stringhashmap()
+stringhashmap<V>::stringhashmap(int n)
 {
-    MAXN = 1;
+    // Ensure MAXN is always greater than 0 to allow for proper resizing
+    if(n >= 1){
+        MAXN = n;
+    }else{
+        MAXN = 1;
+    }
     ver = 2;
     pos = new int[ver];
     hashtable = new KeyValue<string, V>*();
     initTable();
+}
+
+template <typename V>
+stringhashmap<V>::stringhashmap(const stringhashmap<V> &other) {
+    MAXN = other.MAXN;
+    ver = other.ver;
+    pos = new int[ver];  
+    std::copy(other.pos, other.pos + ver, pos);  
+
+    hashtable = new KeyValue<string, V>*[ver];  // Allocate new hashtable
+    for (int i = 0; i < ver; ++i) {
+        hashtable[i] = new KeyValue<string, V>[MAXN];  // Allocate each row
+        for (int j = 0; j < MAXN; ++j) {
+            hashtable[i][j] = other.hashtable[i][j];  // Copy each element
+        }
+    }
+}
+
+template <typename V>
+stringhashmap<V>& stringhashmap<V>::operator=(const stringhashmap<V> &other) {
+    if (this == &other) {
+        return *this;  // Handle self-assignment
+    }
+
+    // Free existing resources
+    for (int i = 0; i < ver; ++i) {
+        delete[] hashtable[i];
+    }
+    delete[] hashtable;
+    delete[] pos;
+
+    // Copy new values
+    MAXN = other.MAXN;
+    ver = other.ver;
+    pos = new int[ver];  
+    std::copy(other.pos, other.pos + ver, pos);  
+
+    hashtable = new KeyValue<string, V>*[ver];  // Allocate new hashtable
+    for (int i = 0; i < ver; ++i) {
+        hashtable[i] = new KeyValue<string, V>[MAXN];  // Allocate each row
+        for (int j = 0; j < MAXN; ++j) {
+            hashtable[i][j] = other.hashtable[i][j];  // Copy each element
+        }
+    }
+
+    return *this;
+}
+
+// Move Constructor
+template <typename V>
+stringhashmap<V>::stringhashmap(stringhashmap<V> &&other) noexcept {
+    MAXN = other.MAXN;
+    ver = other.ver;
+    pos = other.pos;  // Take ownership of other's pos array
+    hashtable = other.hashtable;  // Take ownership of other's hashtable
+
+    other.pos = nullptr;  // Nullify other's pointers
+    other.hashtable = nullptr;
+}
+
+// Move Assignment Operator
+template <typename V>
+stringhashmap<V>& stringhashmap<V>::operator=(stringhashmap<V> &&other) noexcept {
+    if (this == &other) {
+        return *this;  // Handle self-assignment
+    }
+
+    // Free existing resources
+    for (int i = 0; i < ver; ++i) {
+        delete[] hashtable[i];
+    }
+    delete[] hashtable;
+    delete[] pos;
+
+    // Steal other's resources
+    MAXN = other.MAXN;
+    ver = other.ver;
+    pos = other.pos;
+    hashtable = other.hashtable;
+
+    // Nullify other's pointers
+    other.pos = nullptr;
+    other.hashtable = nullptr;
+
+    return *this;
 }
 
 /* Function to retrieve the value associated with a key
@@ -163,7 +258,7 @@ template <typename V>
 void stringhashmap<V>::insert(const string &key, const V &value){
     int tableID = 0;
     int cnt = 0;
-    int n = MAXN / 2;
+    int n = 1 + (MAXN / 2); // Add 1 to handle when MAXN = 1
     insert(key, value, tableID, cnt, n);
 }
 
@@ -184,27 +279,8 @@ void stringhashmap<V>::createHashTable(arraylist<pair<string, V>> &keyValuePairs
     }
 
     lock.unlock();
-    printTable();
 }
 
-/* function to print hash table contents */
-template <typename V>
-void stringhashmap<V>::printTable()
-{
-    std::lock_guard<std::mutex> lock(mtx);
-    printf("Final hash tables:\n");
-    for (int i = 0; i < ver; i++, printf("\n"))
-    {
-        for (int j = 0; j < MAXN; j++)
-        {
-            if (hashtable[i][j].value.has_value())
-                std::cout << hashtable[i][j].key.c_str() << ":" << hashtable[i][j].value.value() << " ";
-            else
-                printf("- ");
-        }
-    }
-    printf("\n");
-}
 
 /* function to return a list of all the keys in the hashtable*/
 template <typename V>
@@ -247,6 +323,7 @@ void stringhashmap<V>::initTable()
         hashtable[i] = new KeyValue<string, V>[MAXN]; // Allocate columns based on MAXN
         for (int j = 0; j < MAXN; j++)
         {
+            hashtable[i][j].key = "";
             hashtable[i][j].value = nullopt; // Initialize to null
         }
     }
@@ -317,7 +394,130 @@ void stringhashmap<V>::rehash() {
 }
 
 template <typename V>
-stringhashmap<V>::~stringhashmap() {
+void stringhashmap<V>::serialize(const string& filename) {
+    std::lock_guard<std::mutex> lock(mtx);
+    std::ofstream file(filename, std::ios::binary);
+    if (!file.is_open()) {
+        throw std::runtime_error("Error: Failed to open file for writing.");
+    }
+
+    // Write the basic metadata
+    file.write(reinterpret_cast<const char*>(&MAXN), sizeof(MAXN));
+    file.write(reinterpret_cast<const char*>(&ver), sizeof(ver));
+
+    // Write the pos array
+    file.write(reinterpret_cast<const char*>(pos), sizeof(int) * ver);
+
+    // Write the hashtable contents
+    // Loop through the cuckoo versions
+    for (int i = 0; i < ver; i++) {
+        // Loop through all columns
+        for (int j = 0; j < MAXN; j++) {
+            // Serialize the size of the key string
+            size_t key_size = hashtable[i][j].key.size();
+            file.write(reinterpret_cast<const char*>(&key_size), sizeof(key_size));
+            // Serialize the key
+            file.write(hashtable[i][j].key.c_str(), key_size);
+
+            // Serialize whether the value is null or not
+            bool has_value = hashtable[i][j].value.has_value();
+            file.write(reinterpret_cast<const char*>(&has_value), sizeof(bool));
+            if (has_value) {
+                // If the value isnt null then retrieve the arraylist value from the hashtable
+                V value = hashtable[i][j].value.value();
+                // Serialize the arraylist to a string for ease of binary serialisation
+                serialiseArraylist serialiser = serialiseArraylist();
+                string serializedValue = serialiser.serialiseArraylistIntoString(value);
+                
+                // Serialize the size of the value string
+                size_t value_size = serializedValue.size();
+                file.write(reinterpret_cast<const char*>(&value_size), sizeof(value_size));
+                
+                // Serialize the value
+                file.write(serializedValue.c_str(), value_size);
+                cout << "wrote to file" << endl;
+            }
+        }
+    }
+
+    file.close();
+    std::cout << "Object serialized successfully." << std::endl;
+}
+
+
+
+template <typename V>
+stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
+    cout << "deserializing " << filename << endl;
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) {
+        throw std::runtime_error("Error: Failed to open file for reading.");
+    }
+
+    // Read the metadata (MAXN and ver)
+    int MAXN_read, ver_read;
+    file.read(reinterpret_cast<char*>(&MAXN_read), sizeof(MAXN_read));
+    file.read(reinterpret_cast<char*>(&ver_read), sizeof(ver_read));
+    cout << MAXN_read << endl;
+
+    // Create a new hashmap object with the read MAXN and assign the ver
+    stringhashmap<V> hashmap(MAXN_read);
+    hashmap.ver = ver_read;
+
+    // Read the pos array
+    file.read(reinterpret_cast<char*>(hashmap.pos), sizeof(int) * ver_read);
+
+    cout << hashmap.pos << endl;
+    // Read the hashtable contents
+    for (int i = 0; i < ver_read; i++) {
+        for (int j = 0; j < MAXN_read; j++) {
+            // Read the size of the key string
+            size_t key_size;
+            file.read(reinterpret_cast<char*>(&key_size), sizeof(key_size));
+            std::cout << "key_size: " << key_size << std::endl;
+            // Size the key string to the read size and initialise to all spaces
+            string key(key_size, ' ');
+            // Read the key from the file
+            file.read(key.data(), key_size);
+            std::cout << "key: " << key << std::endl;
+
+            // Read whether or not the associated value is null
+            bool has_value;
+            file.read(reinterpret_cast<char*>(&has_value), sizeof(bool));
+            std::cout << "has_value: " << has_value << std::endl;
+            
+            // Set the key in the hashtable
+            hashmap.hashtable[i][j].key = key;
+            if (has_value) {
+                // If the value is not null then read the length of the value string
+                size_t length;
+                file.read(reinterpret_cast<char*>(&length), sizeof(length));
+                // Resize the serializedValue string to the length and default to all spaces
+                string serializedValue(length, ' ');
+                // Read the serialized value from the file
+                file.read(&serializedValue[0], length);
+                cout << "value read with length: " << length << endl;
+                
+                // Convert the string to arraylist
+                serialiseArraylist serialiser = serialiseArraylist();
+                arraylist<pair<string, float>> value = serialiser.deserialiseintoArraylist(serializedValue);
+                // Assign the value in the hashtable
+                hashmap.hashtable[i][j].value = value;
+            } else {
+                cout << "No value" << endl;
+                hashmap.hashtable[i][j].value = std::nullopt;
+            }
+        }
+    }
+    cout << "hashtable deserialized and populated" << endl;
+
+    file.close();
+    std::cout << "Object deserialized successfully." << std::endl;
+    return hashmap;
+}
+
+template <typename V>
+stringhashmap<V>::~stringhashmap() noexcept{
     for (int i = 0; i < ver; i++) {
         delete[] hashtable[i]; // Delete each row
     }
