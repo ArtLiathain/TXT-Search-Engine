@@ -1,6 +1,6 @@
 #include <iostream>
 #include "../include/trie.h"
-#include "../include/Arraylist.h"
+#include "../include/arraylist.h"
 using namespace std;
 #include "../include/LinkedList.h"
 #include "../include/Parser.h"
@@ -52,7 +52,7 @@ int main(int argc, char const *argv[])
         parser.searchBook(); // Search for a book
     }
     if (parser.checkOption("autocomplete")) {
-        Arraylist<string> results = autoComplete.getArrayList_withPrefix(parser.autoComplete());
+        arraylist<string> results = autoComplete.getArrayList_withPrefix(parser.autoComplete());
         for (int i = 0; i < results.length; i++) {
             cout << results.get(i) << endl;
         }

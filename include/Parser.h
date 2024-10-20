@@ -1,34 +1,31 @@
 #ifndef PARSER_H
 #define PARSER_H
+#include "../include/arraylist.h"
 #include <iostream>
 #include <map>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <stdexcept>
+using namespace std;
 
 class Parser {
 public:
     Parser(); // Constructor
 
-    bool checkOption(const std::string& name);
+    bool checkOption(const string& name);
 
     // Add an option with a default value
-    template<typename T>
-    void addOption(const std::string& name, const std::string& description, T defaultValue);
+    void addOption(const string& name, const string& description, arraylist<string> defaultValue);
 
     // Add a flag (boolean option)
-    void addFlag(const std::string& name, const std::string& description);
+    void addFlag(const string& name, const string& description);
 
     // Parse arguments
     void parse(int argc, const char* argv[]);
 
     // Parser Setup
     void parserSetup();
-
-    // Get the value of an option
-    template<typename T>
-    T getOption(const std::string& name) const;
 
     // Print help/usage information
     void printHelp() const;
@@ -40,56 +37,31 @@ public:
     void searchBook();
 
     //autocomplete prefix
-    std::string autoComplete();
+    string autoComplete();
+
+    // Get the value of an option
+    arraylist<string> getOption(const string& name) const;
 
 
 private:
     // Internal Option structure
     struct Option {
-        std::string description;
-        std::string value;
+        string description;
+        arraylist<string> value; 
         bool inCLI = false;
         bool isFlag;
 
         // Default constructor
-        Option() : description(""), value(""), isFlag(false) {}
+        Option() : description(""), value(arraylist<string>(1)), isFlag(false) {}
 
         // Parameterized constructor
-        Option(const std::string& desc, const std::string& val, bool flag = false)
+        Option(const string& desc, const arraylist<string> val, bool flag = false)
             : description(desc), value(val), isFlag(flag) {}
     };
     
     // Store options and positional arguments
-    std::map<std::string, Option> options;
-    std::vector<std::string> positionalArgs;
-
-    // Convert any type to string
-    template<typename T>
-    std::string toString(const T& value) const;
-
-    // Convert string to any type
-    template<typename T>
-    T fromString(const std::string& str) const;
+    map<string, Option> options;
 };
-
-// Template method implementations must be in the header file (as they are generated at compile-time)
-
-template<typename T>
-void Parser::addOption(const std::string& name, const std::string& description, T defaultValue) {
-    options[name] = Option(description, toString(defaultValue), false);
-}
-
-template<typename T>
-T Parser::getOption(const std::string& name) const {
-    return fromString<T>(options.at(name).value);
-}
-
-template<typename T>
-std::string Parser::toString(const T& value) const {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-}
 
 
 #endif // PARSER_H
