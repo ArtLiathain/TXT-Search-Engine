@@ -141,4 +141,4 @@ int LinkedList<T>::size() const
     return length;
 }
 
-#endif // LINKEDLIST_H
+#endif
