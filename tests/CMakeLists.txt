@@ -1,6 +1,5 @@
 include(GoogleTest)
 
-
 add_executable(
   arraylist_test
   arraylist_test.cpp
@@ -9,8 +8,21 @@ target_link_libraries(
   arraylist_test
   GTest::gtest_main
 )
-
 gtest_discover_tests(arraylist_test)
+
+
+add_executable(
+  searchIndex_test
+  searchIndex_test.cc
+  ../src/searchIndex.cpp
+  ../src/fileReader.cpp
+)
+target_link_libraries(
+  searchIndex_test
+  GTest::gtest_main
+)
+gtest_discover_tests(searchIndex_test)
+
 
 add_executable(
   mergeSort_test
@@ -18,12 +30,9 @@ add_executable(
   ../src/mergeSort.cpp
 )
 
-
-
 target_link_libraries(
   mergeSort_test
   GTest::gtest_main
 )
-
 
 gtest_discover_tests(mergeSort_test)

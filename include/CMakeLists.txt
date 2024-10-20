@@ -1,8 +1,9 @@
 set(HEADER_FILES
     LinkedList.h
-    mergeSort.h
     fileReader.h
+    searchIndex.h
     hashmap.h
+    mergeSort.h
 )
 add_library(headers INTERFACE)
 

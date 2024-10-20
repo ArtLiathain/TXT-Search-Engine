@@ -7,11 +7,11 @@ int main(int argc, char const *argv[])
     
     auto startread = std::chrono::high_resolution_clock::now();
     fileReader reader = fileReader();
-    arraylist<string> books = reader.getDirectories();
+    arraylist<string> books = reader.getBooks();
 
-    for (int i = 0; i < books.length; i++){
-        reader.readFile(books.get(i));
-    }
+    // for (int i = 0; i < books.length; i++){
+    //     reader.readFile(books.get(i));
+    // }
     auto endread = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> durationread = endread - startread;
     std::cout << "File indexing took " << durationread.count() << " seconds" << std::endl;
