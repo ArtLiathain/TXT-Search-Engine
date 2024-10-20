@@ -39,6 +39,9 @@ public:
     // Search for a book
     void searchBook();
 
+    //autocomplete prefix
+    std::string autoComplete();
+
 
 private:
     // Internal Option structure

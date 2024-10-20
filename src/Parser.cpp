@@ -1,4 +1,6 @@
 #include "../include/Parser.h"
+#include "../include/trie.h"
+#include "../include/Arraylist.h"
 #include <iostream>
 #include <map>
 #include <vector>
@@ -44,6 +46,8 @@ void Parser::parse(int argc, const char* argv[]) {
                 }
                 else if (i + 1 < argc && argv[i + 1][0] != '-') {
                     options[name].value = argv[++i]; // Set regular option value
+                } else {
+                    options[name].value = options[name].value; // Set default value
                 }
                 options[name].inCLI = true;
             } else {
@@ -59,7 +63,8 @@ void Parser::parse(int argc, const char* argv[]) {
 void Parser::parserSetup() {
     // Adding options
     addOption("list", "List top x books", 0); // int
-    addOption("search", "Search for a book", "default"); // string
+    addOption("search", "Search for a book", "?"); // string
+    addOption("autocomplete", "returns a list of words starting with a given prefix", "?"); // string
 
     // Adding flags
     addFlag("verbose", "Enable verbose output");
@@ -80,6 +85,10 @@ void Parser::listBooks() {
 
 void Parser::searchBook() {
     std::cout << "Searching for book: " << Parser::getOption<std::string>("search") << std::endl;
+}
+
+std::string Parser::autoComplete() {
+    return Parser::getOption<std::string>("autocomplete");
 }
 
 
