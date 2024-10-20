@@ -5,6 +5,7 @@ set(HEADER_FILES
     searchIndex.h
     hashmap.h
     mergeSort.h
+    serialiseArraylist.h
 )
 add_library(headers INTERFACE)
 
