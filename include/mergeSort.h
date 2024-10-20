@@ -17,4 +17,4 @@ private:
     arraylist<pair<string, float>>  breakUp(arraylist<pair<string, float>> array, int low, int high);
 };
 
-#endif MERGESORT_HPP
+#endif

@@ -19,4 +19,4 @@ public:
     void andFunc(unordered_map<string, float>* searchIndex, arraylist<pair<string, float>> *booksContainingWordArray);
     arraylist<pair<string, float>> notFunc(arraylist<pair<string, float>> *booksContainingWordArray);
 };
-#endif SEARCHINDEX_HPP
+#endif
