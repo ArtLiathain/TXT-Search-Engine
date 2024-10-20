@@ -5,6 +5,7 @@ set(SOURCE_FILES
     mergeSort.cpp
     searchIndex.cpp
     serialiseArraylist.cpp
+    Parser.cpp
 )
 add_executable(my_executable ${SOURCE_FILES})
 
