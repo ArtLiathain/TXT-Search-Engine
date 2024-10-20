@@ -3,7 +3,7 @@ set(HEADER_FILES
     fileReader.h
     searchIndex.h
     hashmap.h
-
+    mergeSort.h
 )
 add_library(headers INTERFACE)
 
