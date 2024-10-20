@@ -42,7 +42,7 @@ TEST(searchIndex_test, or)
     ASSERT_EQ(searchIndex["book2"], 6); // book2 = index 3 value 2 *3
 }
 
-TEST(searchIndex_test, or)
+TEST(searchIndex_test, and)
 {
     unordered_map<string, arraylist<pair<string, float>>> wordIndex = getWordIndex();
     searchIndex search = searchIndex();
