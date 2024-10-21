@@ -1,21 +1,54 @@
 #include "../include/trie.h"
+#include "../include/hashmap.h"
 #include <iostream>
 #include <unordered_map>
+#include <fstream>
 using namespace std;
 
 trie::trie()
 {
-    unordered_map<string, Node *> children;
+    stringhashmap<Node *> children = stringhashmap<Node *>();
     // Root can't have value so its always ""
     root = new Node{"", false, children};
 }
 
-trie::~trie()
-{
+trie::trie(const trie &other){
+    root = other.root;
 }
+
+trie::trie(trie &&other) noexcept{
+    root = other.root;
+    other.root = nullptr;
+}
+
+trie& trie::operator=(const trie &other){
+    if (this == &other) {
+        return *this;  // Handle self-assignment
+    }
+
+    root = other.root;
+    
+    return *this;
+}
+
+trie& trie::operator=(trie &&other) noexcept{
+    if (this == &other) {
+        return *this;  // Handle self-assignment
+    }
+
+    root = other.root;
+
+    other.root = nullptr;
+    
+    return *this;
+}
+
+trie::~trie()
+{}
 
 void trie::insert(string word)
 {
+    cout << "inserting " << word << endl;
     Node *cur = root;
     // Only lowercase words
     for (int j = 0; j < word.length(); j++){
@@ -26,21 +59,22 @@ void trie::insert(string word)
         // Get the current substring of length depth
         string frag = word.substr(0, i + 1);
         Node *node;
-        // If node doesn't exist create a new one otherwise go to the mathcing child node
-        if (cur->children.count(frag) == 0)
+        // If node doesn't exist create a new one otherwise go to the matching child node
+        if (cur->children.keyExists(frag) == false)
         {
-            unordered_map<string, Node *> children;
-            node = new Node{"", false, children};
-            cur->children[frag] = node;
+            stringhashmap<Node *> children = stringhashmap<Node *>();
+            node = new Node{frag, false, children};
+            cur->children.insert(frag, node);
         }
         else
         {
-            node = cur->children[frag];
+            node = cur->children.getValue(frag);
         }
         cur = node;
     }
     // Know if this is an inputted word
     cur->endOfWord = true;
+    cout << "end of word " << cur->key << " " << cur->endOfWord << endl;
 }
 
 arraylist<string> trie::getArrayList()
@@ -48,9 +82,11 @@ arraylist<string> trie::getArrayList()
     arraylist<string> result = arraylist<string>(10);
     Node *cur = root;
     // Loop through and convert words to arraylist order is not deterministic
-    for (auto x : cur->children)
+    arraylist<string> keys = cur->children.getAllKeys();
+    for (int i = 0; i < keys.length; i++)
     {
-        getArrayList_rec(x.second->children, "", &result);
+        // Recursive search call
+        getArrayList_rec(cur->children.getValue(keys.get(i))->children, "", &result);
     }
     return result;
 }
@@ -63,28 +99,30 @@ arraylist<string> trie::getArrayList_withPrefix(string prefix)
     }
     arraylist<string> result = arraylist<string>(10);
     Node *cur = root;
-    for (auto x : cur->children)
+    arraylist<string> keys = cur->children.getAllKeys();
+    for (int i = 0; i < keys.length; i++)
     {
         // Recursive search call
-        getArrayList_rec(x.second->children, prefix, &result);
+        getArrayList_rec(cur->children.getValue(keys.get(i))->children, prefix, &result);
     }
     return result;
 }
 
-void trie::getArrayList_rec(unordered_map<std::string, Node *> children, string prefix, arraylist<string> *result)
+void trie::getArrayList_rec(stringhashmap<trie::Node *> children, string prefix, arraylist<string> * result)
 {
+    arraylist<string> keys = children.getAllKeys();
     // Loop through each child to check if prefix matches
-    for (auto x : children)
+    for (int i = 0; i < keys.length; i++)
     {
         // Only insert if the word is at least the prefix and is a full word
-        if (x.second->endOfWord && x.first.substr(0, prefix.length()) == prefix)
+        if (children.getValue(keys.get(i))->endOfWord && children.getValue(keys.get(i))->key.substr(0, prefix.length()) == prefix)
         {
-            result->insert(x.first);
+            result->insert(children.getValue(keys.get(i))->key);
         }
 
-        if (x.first.substr(0, prefix.length()) == prefix || prefix.substr(0, x.first.length()) == x.first)
+        if (children.getValue(keys.get(i))->key.substr(0, prefix.length()) == prefix || prefix.substr(0, children.getValue(keys.get(i))->key.length()) == children.getValue(keys.get(i))->key)
         {
-            getArrayList_rec(x.second->children, prefix, result);
+            getArrayList_rec(children.getValue(keys.get(i))->children, prefix, result);
         }
     }
 }
