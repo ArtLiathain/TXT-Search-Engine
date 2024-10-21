@@ -72,3 +72,20 @@ TEST(trie_test, CaseInsensitivity)
     ASSERT_EQ(words.length, 1);
     EXPECT_EQ(words.get(0), "apple");
 }
+
+TEST(trie_test, SerializeAndDeserialize)
+{
+    trie t;
+    t.insert("hello");
+    t.insert("world");
+    t.insert("third");
+
+    arraylist<std::string> words = t.getArrayList();
+
+    t.serialize("trieTest.dat");
+
+    trie restored = trie::deserialize("trieTest.dat");
+    arraylist<std::string> restoredWords = restored.getArrayList();
+
+    ASSERT_EQ(words.length, restoredWords.length);
+}

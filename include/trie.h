@@ -41,6 +41,8 @@ public:
     arraylist<string> getArrayList_withPrefix(string prefix);
     void getArrayList_rec(stringhashmap<trie::Node *> children, string prefix, arraylist<string> * result);
     void serialize(const string &filename);
+    void serializeNode(ofstream &file, Node *node);
+    static Node* deserializeNode(ifstream &file);
     static trie deserialize(const string &filename);
     trie& operator=(const trie &other);
     trie& operator=(trie &&other) noexcept;
