@@ -31,16 +31,17 @@ TEST(hashmap_test, insertIntoFullMap)
 TEST(hashmap_test, keyNotPresent)
 {
     stringhashmap<int> hashmap = stringhashmap<int>(2);
-    ASSERT_FALSE(hashmap.getValue("Test") == 42);
+    ASSERT_THROW(hashmap.getValue("Test1"), std::out_of_range);
 }
 
 TEST(hashmap_test, insertAndRemove)
 {
+    
     stringhashmap<int> hashmap = stringhashmap<int>(2);
     hashmap.insert("Test1", 42);
     ASSERT_EQ(hashmap.getValue("Test1"), 42);
     hashmap.remove("Test1");
-    ASSERT_FALSE(hashmap.getValue("Test1") == 42);
+    ASSERT_THROW(hashmap.getValue("Test1"), std::out_of_range);
 }
 
 TEST(hashmap_test, serialize)
