@@ -1,6 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include "../include/arraylist.h"
+#include "./hashmap.h"
 #include <iostream>
 #include <map>
 #include <vector>
@@ -21,6 +22,9 @@ public:
     // Add a flag (boolean option)
     void addFlag(const string& name, const string& description);
 
+    // Add a new book to the data structure
+    void addBook();
+
     // Parse arguments
     void parse(int argc, const char* argv[]);
 
@@ -28,7 +32,7 @@ public:
     void parserSetup();
 
     // Print help/usage information
-    void printHelp() const;
+    void printHelp();
 
     // List books
     void listBooks(); 
@@ -40,7 +44,7 @@ public:
     string autoComplete();
 
     // Get the value of an option
-    arraylist<string> getOption(const string& name) const;
+    arraylist<string> getOption(const string& name);
 
 
 private:
@@ -49,18 +53,18 @@ private:
         string description;
         arraylist<string> value; 
         bool inCLI = false;
-        bool isFlag;
+        bool here;
 
         // Default constructor
-        Option() : description(""), value(arraylist<string>(1)), isFlag(false) {}
+        Option() : description(""), value(arraylist<string>(1)), here(false) {}
 
         // Parameterized constructor
-        Option(const string& desc, const arraylist<string> val, bool flag = false)
-            : description(desc), value(val), isFlag(flag) {}
+        Option(const string& desc, const arraylist<string> val, bool here = false)
+            : description(desc), value(val), here(here) {}
     };
     
     // Store options and positional arguments
-    map<string, Option> options;
+    stringhashmap<Option> options = stringhashmap<Option>(20);
 };
 
 

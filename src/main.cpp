@@ -11,9 +11,6 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    // EANNA TESTING
-
-
     Parser parser;
     trie autoComplete;
     
@@ -45,6 +42,9 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < results.length; i++) {
             cout << results.get(i) << endl;
         }
+    }
+    if (parser.checkOption("addBook")) {
+        parser.addBook(); // Add a book
     }
     // Continue with your program logic
     return 0;
