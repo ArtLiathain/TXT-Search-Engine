@@ -11,6 +11,9 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
+    // EANNA TESTING
+
+
     Parser parser;
     trie autoComplete;
     
