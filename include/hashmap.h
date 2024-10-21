@@ -50,7 +50,8 @@ public:
     void insert(const string &key, const V value, int tableID, int cnt, int n);
     void insert(const string &key, const V value);
     void remove(const string &key);
-    V getValue(const string &key);
+    V& getValue(const string &key);
+    bool keyExists(const string &key);
     arraylist<string> getAllKeys();
     void createHashTable(arraylist<pair<string, V>> keyValuePairs);
     void serialize(const string &filename);
@@ -172,7 +173,7 @@ stringhashmap<V>& stringhashmap<V>::operator=(stringhashmap<V> &&other) noexcept
 /* Function to retrieve the value associated with a key
  * key: Which key's value we want to retrieve */
 template <typename V>
-V stringhashmap<V>::getValue(const string &key)
+V& stringhashmap<V>::getValue(const string &key)
 {
     std::lock_guard<std::mutex> lock(mtx);
     for (int i = 0; i < ver; i++)
@@ -183,12 +184,29 @@ V stringhashmap<V>::getValue(const string &key)
             return hashtable[i][index].value.value();
         }
     }
-    return V();
+    throw std::out_of_range("Key not found in the hash table.");
 }
+
+/* function to see if a key exists in the table
+ * &key: Keyword to check*/
+template <typename V>
+bool stringhashmap<V>::keyExists(const string &key)
+{
+    for (int i = 0; i < ver; i++)
+    {
+        int index = hashKey(i + 1, key);
+        if (hashtable[i][index].key == key)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /* function to place a key-value pair in one of its possible positions
  * &key: Keyword being hashed
- * &value: Value object containing the amount of ocurrences and the book title
+ * value: Value object containing the amount of ocurrences and the book title
  * tableID: Which version of the table the key is being inserted into
  * cnt: Number of displacements
  * n: Amount of elements */
