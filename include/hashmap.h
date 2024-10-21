@@ -47,12 +47,12 @@ public:
     stringhashmap(stringhashmap<V> &&other) noexcept;
     ~stringhashmap() noexcept;
     void initTable();
-    void insert(const string &key, const V &value, int tableID, int cnt, int n);
-    void insert(const string &key, const V &value);
+    void insert(const string &key, const V value, int tableID, int cnt, int n);
+    void insert(const string &key, const V value);
     void remove(const string &key);
     V getValue(const string &key);
     arraylist<string> getAllKeys();
-    void createHashTable(arraylist<pair<string, V>> &keyValuePairs);
+    void createHashTable(arraylist<pair<string, V>> keyValuePairs);
     void serialize(const string &filename);
     static stringhashmap<V> deserialize(const string &filename);
     stringhashmap<V>& operator=(const stringhashmap<V> &other);
@@ -193,7 +193,7 @@ V stringhashmap<V>::getValue(const string &key)
  * cnt: Number of displacements
  * n: Amount of elements */
 template <typename V>
-void stringhashmap<V>::insert(const string &key, const V &value, int tableID, int cnt, int n)
+void stringhashmap<V>::insert(const string &key, const V value, int tableID, int cnt, int n)
 {
     string curKey = key;
     V curValue = value;
@@ -255,7 +255,7 @@ void stringhashmap<V>::insert(const string &key, const V &value, int tableID, in
 /* function to make insertion an easier interface for external classes or for when tableID, cnt and n are defaults
 */
 template <typename V>
-void stringhashmap<V>::insert(const string &key, const V &value){
+void stringhashmap<V>::insert(const string &key, const V value){
     int tableID = 0;
     int cnt = 0;
     int n = 1 + (MAXN / 2); // Add 1 to handle when MAXN = 1
@@ -266,7 +266,7 @@ void stringhashmap<V>::insert(const string &key, const V &value){
 /* function to create a hashtable from an array list
  * &keyValuePairs: Vector of key value pairs received from text rank to take in as input*/
 template <typename V>
-void stringhashmap<V>::createHashTable(arraylist<pair<string, V>> &keyValuePairs)
+void stringhashmap<V>::createHashTable(arraylist<pair<string, V>> keyValuePairs)
 {
     std::unique_lock<std::mutex> lock(mtx);
     int n = keyValuePairs.length;
