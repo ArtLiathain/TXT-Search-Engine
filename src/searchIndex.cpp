@@ -51,7 +51,7 @@ void searchIndex::orFunc(stringhashmap<float> *searchIndex, arraylist<pair<strin
         // If books is in the index already increment value else add the value
         if (searchIndex->keyExists(book))
         {
-            (*searchIndex).insert(book, booksContainingWordArray->get(j).second);
+            (*searchIndex).insert(book, (*searchIndex).getValue(book) + booksContainingWordArray->get(j).second);
         }
         else
         {

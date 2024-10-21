@@ -184,6 +184,7 @@ V& stringhashmap<V>::getValue(const string &key)
             return hashtable[i][index].value.value();
         }
     }
+    cout << key << " KEY" << endl;
     throw std::out_of_range("Key not found in the hash table.");
 }
 

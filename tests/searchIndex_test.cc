@@ -34,12 +34,12 @@ TEST(searchIndex_test, or)
     stringhashmap<arraylist<pair<string, float>>> wordIndex = getWordIndex();
     searchIndex search = searchIndex();
     stringhashmap<float> searchIndex;
-
+    
     search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
     search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
     search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
 
-    ASSERT_EQ(searchIndex.getValue("word2"), 6); // book2 = index 3 value 2 *3
+    ASSERT_EQ(searchIndex.getValue("book2"), 6); // book2 = index 3 value 2 *3
 }
 
 TEST(searchIndex_test, and)
@@ -54,5 +54,5 @@ TEST(searchIndex_test, and)
     ASSERT_EQ(searchIndex.getValue("book2"), 6); // book2 = index 3 value 2 *3
     wordIndex.getValue("word3").remove(2);
     search.andFunc(&searchIndex, &wordIndex.getValue("word3"));
-    ASSERT_EQ(searchIndex.getValue("book2"), 0); // book2 = index 3 value 2 *3 * 0
+    ASSERT_THROW(searchIndex.getValue("book2"), std::out_of_range); // book2 = index 3 value 2 *3 * 0
 }
