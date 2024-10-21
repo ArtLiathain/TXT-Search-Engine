@@ -36,7 +36,6 @@ int main(int argc, char const *argv[])
         parser.listBooks(); // List books
     }
     if (parser.checkOption("search")) {
-        cout << "searcg" << endl;
         parser.searchBook(); // Search for a book
     }
     if (parser.checkOption("autocomplete")) {
@@ -44,6 +43,9 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < results.length; i++) {
             cout << results.get(i) << endl;
         }
+    }
+    if (parser.checkOption("addBook")) {
+        parser.addBook(); // Add a book
     }
     // Continue with your program logic
     return 0;

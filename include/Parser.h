@@ -22,6 +22,9 @@ public:
     // Add a flag (boolean option)
     void addFlag(const string& name, const string& description);
 
+    // Add a new book to the data structure
+    void addBook();
+
     // Parse arguments
     void parse(int argc, const char* argv[]);
 
