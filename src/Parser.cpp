@@ -12,24 +12,21 @@ using namespace std;
 Parser::Parser() = default;
 
 bool Parser::checkOption(const string& name) {
-    if (options.count(name) > 0) {
-        return options[name].inCLI;
-    } else {
-        throw invalid_argument("Unknown option: " + name);
-    }
+    return options.getValue(name).inCLI;
 }
 
 void Parser::addOption(const string& name, const string& description, arraylist<string> defaultValue) {
-    options[name] = Option(description, defaultValue, false);
+    options.insert(name, Option(description, defaultValue, true));
+
 }
 
-arraylist<string> Parser::getOption(const string& name) const {
-    return options.at(name).value;
+arraylist<string> Parser::getOption(const string& name) {
+    return options.getValue(name).value;
 }
 
 // Add a flag (boolean option)
 void Parser::addFlag(const string& name, const string& description) {
-    options[name] = Option(description, arraylist<string>(1), true);
+    options.insert(name, Option(description, arraylist<string>(1), true));
 }
 
 // Parse arguments
@@ -39,17 +36,19 @@ void Parser::parse(int num_args, const char* arg_array[]) {
         if (arg[0] == '-') {
             // It's an option
             string name = arg.substr(1);
-            if (options.count(name) > 0) {
+            if (options.getValue(name).here) {
+                Option opt = options.getValue(name);
                 if (name == "search") {
                     // Capture all words after -search until the next option
                     while (i + 1 < num_args && arg_array[i + 1][0] != '-') {
-                        options[name].value.insert(arg_array[++i]);
+                        opt.value.insert(arg_array[++i]);
                     }
                 }
                 else if (i + 1 < num_args && arg_array[i + 1][0] != '-') {
-                    options[name].value.insert(arg_array[++i]); // Set regular option value
+                    opt.value.insert(arg_array[++i]); // Set regular option value
                 } 
-                options[name].inCLI = true;
+                opt.inCLI = true;
+                options.insert(name, opt);
             } else {
                 cerr << "Unknown option: " << name << endl;
             }
@@ -68,11 +67,12 @@ void Parser::parserSetup() {
     addFlag("help", "Display help information");
 }
 
-void Parser::printHelp() const {
-    cout << "Usage: program [options] [arguments]" << endl;
-    cout << "Options:" << endl;
-    for (const auto& pair : options) {
-        cout << "  -" << pair.first << ": " << pair.second.description << endl;
+void Parser::printHelp() {
+    arraylist<string> keys = options.getAllKeys();
+    for (int i = 0; i < keys.getLength(); i++) {
+        string key = keys.get(i);
+        Option opt = options.getValue(key);
+        cout << "  -" << key << ": " << opt.description << endl;
     }
 }
 
@@ -81,7 +81,7 @@ void Parser::listBooks() {
 }
 
 void Parser::searchBook() {
-    cout << "Searching for book with word: " << getOption("search").get(1) << endl;
+    cout << "Searching for book with word: " << getOption("search").get(0) << endl;
 }
 
 string Parser::autoComplete() {
