@@ -1,9 +1,9 @@
 #ifndef TRIE_H
 #define TRIE_H
-#include <unordered_map>
-#include <iostream>
 #include "../include/arraylist.h"
 #include "../include/hashmap.h"
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 class trie

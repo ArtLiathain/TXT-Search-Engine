@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include "hashmap.h"
 #include "arraylist.h"
+#include "trie.h"
 using namespace std;
 
 class fileReader
@@ -15,7 +16,8 @@ private:
 public:
     fileReader(/* args */);
     ~fileReader();
-    void readFile(string fileName, stringhashmap<arraylist<pair<string, float>>>* wordIndex);
-    arraylist<string> getBooks();
+    static void indexBook(string fileName, stringhashmap<arraylist<pair<string, float>>>* wordIndex, trie* autocomplete);
+    static void indexBooks(stringhashmap<arraylist<pair<string, float>>>* wordIndex, trie* autocomplete);
+    static arraylist<string> getBooks();
 };
 #endif

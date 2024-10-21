@@ -220,7 +220,6 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
     while (true)
     {
         std::unique_lock<std::mutex> lock(mtx);
-
         if (cnt == n)
         {
             printf("%s unpositioned\n", curKey.c_str());
@@ -387,25 +386,20 @@ void stringhashmap<V>::rehash() {
 
     // Initialize new hashtable
     hashtable = new KeyValue<string, V>*[ver];
-    for (int i = 0; i < ver; i++) {
-        hashtable[i] = new KeyValue<string, V>[MAXN];
-        for (int j = 0; j < MAXN; j++) {
-            hashtable[i][j].value = nullopt; // Initialize to nullopt
-        }
-    }
 
     // Rehash existing elements
     for (int i = 0; i < ver; i++) {
+        hashtable[i] = new KeyValue<string, V>[MAXN];
         for (int j = 0; j < oldMAXN; j++) {
             if (oldTable[i][j].value.has_value()) { // Only rehash if there is a value
-                const string &key = oldTable[i][j].key;
-                const V &value = oldTable[i][j].value.value();
-
-                lock.unlock();
-                // Use the insert function to insert the key-value pair into the new table
-                insert(key, value, i, 0, oldMAXN); // Insert into the new hashtable
-                lock.lock();
+                hashtable[i][j].key = oldTable[i][j].key;
+                hashtable[i][j].value = oldTable[i][j].value.value();
+            }else{
+                hashtable[i][j].value = nullopt;
             }
+        }
+        for(int k = oldMAXN; k < MAXN; k++){
+            hashtable[i][k].value = nullopt;
         }
         delete[] oldTable[i]; // Clean up old table row
     }

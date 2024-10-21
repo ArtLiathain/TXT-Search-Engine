@@ -23,7 +23,7 @@ public:
     void insert(T value);
     void insert(T value, int index);
     void remove(int index);
-    T get(int index);
+    T& get(int index);
 };
 
 template <typename T>
@@ -96,7 +96,7 @@ void arraylist<T>::insert(T value, int index)
         T *newArray = new T[capacity * 2];
         for (int i = 0; i < length; i++)
         {
-            newArray[i] = array[i];
+            newArray[i] = std::move(array[i]);
         }
         delete[] array;
         capacity *= 2;
@@ -105,10 +105,10 @@ void arraylist<T>::insert(T value, int index)
 
     for (int i = length; i > index; i--)
     {
-        array[i] = array[i - 1];
+        array[i] = std::move(array[i - 1]);
     }
     length++;
-    array[index] = value;
+    array[index] = std::move(value);
     writeMutex.unlock();
     readMutex.unlock();
 }
@@ -124,13 +124,13 @@ void arraylist<T>::insert(T value)
         T *newArray = new T[capacity * 2];
         for (int i = 0; i < length; i++)
         {
-            newArray[i] = array[i];
+            newArray[i] = std::move(array[i]);
         }
         delete[] array;
         capacity *= 2;
         array = newArray;
     }
-    array[length] = value;
+    array[length] = std::move(value);
     length++;
     writeMutex.unlock();
     readMutex.unlock();
@@ -149,7 +149,7 @@ void arraylist<T>::remove(int index)
 
     for (int i = index + 1; i < length; i++)
     {
-        array[i - 1] = array[i];
+        array[i - 1] = std::move(array[i]);
     }
 
     length--;
@@ -158,7 +158,7 @@ void arraylist<T>::remove(int index)
 }
 
 template <typename T>
-T arraylist<T>::get(int index)
+T& arraylist<T>::get(int index)
 {
     if (index < 0 || index >= length)
     {
