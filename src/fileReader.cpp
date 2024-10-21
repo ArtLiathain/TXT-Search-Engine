@@ -2,29 +2,33 @@
 
 using namespace std;
 
-unordered_set<string> skippedWords;
+stringhashmap<int> skippedWords;
 
 fileReader::fileReader(/* args */)
 {
     // list of words that should be skipped as thay are not worth counting
-    skippedWords = {
+    std::string skipWords[] = {
         "the", "and", "is", "in", "at", "of", "on", "a", "an", "by", "to", "with",
         "for", "from", "that", "this", "it", "as", "but", "or", "if", "so", "not",
         "are", "were", "be", "been", "was", "can", "will", "shall", "may", "must", "I"};
+    for (int i = 0; i < skipWords->size(); i++)
+    {
+        skippedWords.insert(skipWords[i], 0);
+    }
 }
 
 fileReader::~fileReader()
 {
 }
 
-void fileReader::readFile(string fileName, unordered_map<string, arraylist<pair<string, float>>> *wordIndex)
+void fileReader::readFile(string fileName, stringhashmap<arraylist<pair<string, float>>> *wordIndex)
 {
     string mystring;
     ifstream file;
-    //Open book by name
+    // Open book by name
     file.open("../../archive/" + fileName);
 
-    unordered_map<string, int> wordFrequencyMap;
+    stringhashmap<int> wordFrequencyMap;
 
     int bookWordCount = 0;
 
@@ -47,29 +51,38 @@ void fileReader::readFile(string fileName, unordered_map<string, arraylist<pair<
                 mystring[i] = tolower(mystring[i]);
             }
             // If skipped word don't increment count
-            if (skippedWords.count(mystring))
+            if (skippedWords.keyExists(mystring))
             {
                 continue;
             }
             // Can ignore the need for initialisation as all ints are 0 while null which can be incremented
-            wordFrequencyMap[mystring] += 1;
+            if (wordFrequencyMap.keyExists(mystring))
+            {
+                wordFrequencyMap.insert(mystring, wordFrequencyMap.getValue(mystring) + 1);
+            }
+            else
+            {
+                wordFrequencyMap.insert(mystring, 0);
+            }
             bookWordCount++;
         }
+        arraylist<string> keys = wordFrequencyMap.getAllKeys();
 
         // Loop over every word add to the frequency map
-        for (auto x : wordFrequencyMap)
+        for (int j = 0; j < keys.length; j++)
         {
+            string word = keys.get(j);
             // If value is in the word index add to the arraylist
-            if (wordIndex->count(x.first))
+            if (wordIndex->keyExists(word))
             {
-                (*wordIndex)[x.first].insert(make_pair(fileName, (float)x.second/bookWordCount));
+                (*wordIndex).getValue(word).insert(make_pair(fileName, (float)wordFrequencyMap.getValue(word) / bookWordCount));
             }
             // Add a new array to the index otherwise
             else
             {
                 arraylist<pair<string, float>> tempArrList(200);
-                tempArrList.insert(make_pair(fileName, (float)x.second/bookWordCount));
-                (*wordIndex)[x.first] = std::move(tempArrList);
+                tempArrList.insert(make_pair(fileName, (float)wordFrequencyMap.getValue(word) / bookWordCount));
+                (*wordIndex).insert(word, tempArrList);
             }
         }
     }

@@ -1,11 +1,9 @@
 #ifndef SEARCHINDEX_HPP
 #define SEARCHINDEX_HPP
-#include <unordered_map>
-
 #include <iostream>
 #include "arraylist.h"
 #include "fileReader.h"
-
+#include "hashmap.h"
 using namespace std;
 
 class searchIndex
@@ -15,8 +13,8 @@ private:
 public:
     searchIndex(/* args */);
     ~searchIndex();
-    void orFunc(unordered_map<string, float>* searchIndex, arraylist<pair<string, float>> *booksContainingWordArray);
-    void andFunc(unordered_map<string, float>* searchIndex, arraylist<pair<string, float>> *booksContainingWordArray);
+    void orFunc(stringhashmap<float>* searchIndex, arraylist<pair<string, float>> *booksContainingWordArray);
+    void andFunc(stringhashmap<float>* searchIndex, arraylist<pair<string, float>> *booksContainingWordArray);
     arraylist<pair<string, float>> notFunc(arraylist<pair<string, float>> *booksContainingWordArray);
 };
 #endif

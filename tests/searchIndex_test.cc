@@ -4,9 +4,9 @@ using namespace std;
 
 // Demonstrate some basic assertions.
 
-unordered_map<string, arraylist<pair<string, float>>> getWordIndex()
+stringhashmap<arraylist<pair<string, float>>> getWordIndex()
 {
-    unordered_map<string, arraylist<pair<string, float>>> wordIndex;
+    stringhashmap<arraylist<pair<string, float>>> wordIndex;
     for (int i = 0; i < 10; i++)
     {
         arraylist<pair<string, float>> wordValues;
@@ -17,43 +17,42 @@ unordered_map<string, arraylist<pair<string, float>>> getWordIndex()
             wordValues.insert(pair(text, j));
         }
         std::string word = "word";
-            word += std::to_string(i);
-        wordIndex[word] = wordValues;
+        word += std::to_string(i);
+        wordIndex.insert(word, wordValues);
     }
     return wordIndex;
 }
 
 TEST(searchIndex_test, initialise)
 {
-    unordered_map<string, arraylist<pair<string, float>>> wordIndex = getWordIndex();
-    ASSERT_EQ(wordIndex["word1"].length, 10);
+    stringhashmap<arraylist<pair<string, float>>> wordIndex = getWordIndex();
+    ASSERT_EQ(wordIndex.getValue("word1").length, 10);
 }
 
 TEST(searchIndex_test, or)
 {
-    unordered_map<string, arraylist<pair<string, float>>> wordIndex = getWordIndex();
+    stringhashmap<arraylist<pair<string, float>>> wordIndex = getWordIndex();
     searchIndex search = searchIndex();
-    unordered_map<string, float> searchIndex;
-
-    search.orFunc(&searchIndex, &wordIndex["word1"]);
-    search.orFunc(&searchIndex, &wordIndex["word1"]);
-    search.orFunc(&searchIndex, &wordIndex["word1"]);
+    stringhashmap<float> searchIndex;
     
-    ASSERT_EQ(searchIndex["book2"], 6); // book2 = index 3 value 2 *3
+    search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
+    search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
+    search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
+
+    ASSERT_EQ(searchIndex.getValue("book2"), 6); // book2 = index 3 value 2 *3
 }
 
 TEST(searchIndex_test, and)
 {
-    unordered_map<string, arraylist<pair<string, float>>> wordIndex = getWordIndex();
+    stringhashmap<arraylist<pair<string, float>>> wordIndex = getWordIndex();
     searchIndex search = searchIndex();
-    unordered_map<string, float> searchIndex;
+    stringhashmap<float> searchIndex;
 
-    search.orFunc(&searchIndex, &wordIndex["word1"]);
-    search.andFunc(&searchIndex, &wordIndex["word2"]);
-    search.andFunc(&searchIndex, &wordIndex["word3"]);
-    ASSERT_EQ(searchIndex["book2"], 6); // book2 = index 3 value 2 *3
-    wordIndex["word3"].remove(2);
-    search.andFunc(&searchIndex, &wordIndex["word3"]);
-    ASSERT_EQ(searchIndex["book2"], 0); // book2 = index 3 value 2 *3 * 0
-
+    search.orFunc(&searchIndex, &wordIndex.getValue("word1"));
+    search.andFunc(&searchIndex, &wordIndex.getValue("word2"));
+    search.andFunc(&searchIndex, &wordIndex.getValue("word3"));
+    ASSERT_EQ(searchIndex.getValue("book2"), 6); // book2 = index 3 value 2 *3
+    wordIndex.getValue("word3").remove(2);
+    search.andFunc(&searchIndex, &wordIndex.getValue("word3"));
+    ASSERT_THROW(searchIndex.getValue("book2"), std::out_of_range); // book2 = index 3 value 2 *3 * 0
 }
