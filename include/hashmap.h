@@ -44,6 +44,7 @@ public:
     void insert(const string &key, const V &value, int tableID, int cnt, int n);
     void insert(const string &key, const V &value);
     void remove(const string &key);
+    bool keyExists(const string &key);
     V getValue(const string &key);
     arraylist<string> getAllKeys();
     void printTable();
@@ -85,6 +86,20 @@ V stringhashmap<V>::getValue(const string &key)
         }
     }
     return V();
+}
+
+template <typename V>
+bool stringhashmap<V>::keyExists(const string &key)
+{
+    for (int i = 0; i < ver; i++)
+    {
+        int index = hashKey(i + 1, key);
+        if (hashtable[i][index].key == key)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 /* function to place a key-value pair in one of its possible positions
