@@ -11,7 +11,6 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-
     Parser parser;
     trie autoComplete;
     

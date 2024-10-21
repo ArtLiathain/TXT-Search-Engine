@@ -12,6 +12,18 @@ target_link_libraries(
 gtest_discover_tests(arraylist_test)
 
 add_executable(
+  hashmap_test
+  hashmap_test.cpp
+  ../src/serialiseArraylist.cpp
+)
+target_link_libraries(
+  hashmap_test
+  GTest::gtest_main
+)
+
+gtest_discover_tests(hashmap_test)
+
+add_executable(
   trie_test
   trie_test.cc
   ../src/trie.cpp
