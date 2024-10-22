@@ -87,3 +87,13 @@ arraylist<pair<string, float>> searchIndex::notFunc(arraylist<pair<string, float
     }
     return arrayBooksWithoutTheWord;
 }
+
+arraylist<pair<string, float>> searchIndex::getBookList(stringhashmap<float>* searchIndex){
+    arraylist<pair<string, float>> pairArray = arraylist<pair<string, float>>();
+    arraylist<string> keys = searchIndex->getAllKeys();
+    for (int i = 0; i < keys.length; i++){
+        pairArray.insert(pair(keys.get(i), searchIndex->getValue(keys.get(i))));
+    }
+    mergeSort sort = mergeSort();
+    return sort.sortArray(pairArray);
+}
