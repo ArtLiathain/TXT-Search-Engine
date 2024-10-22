@@ -7,6 +7,7 @@ set(HEADER_FILES
     serialiseArraylist.h
     Parser.h
     arraylist.h
+    initialiser.h
 )
 add_library(headers INTERFACE)
 

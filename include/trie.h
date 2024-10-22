@@ -43,7 +43,7 @@ public:
     void serialize(const string &filename);
     void serializeNode(ofstream &file, Node *node);
     static Node* deserializeNode(ifstream &file);
-    static trie deserialize(const string &filename);
+    static trie* deserialize(const string &filename);
     trie& operator=(const trie &other);
     trie& operator=(trie &&other) noexcept;
 

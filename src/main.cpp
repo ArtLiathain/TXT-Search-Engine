@@ -2,10 +2,11 @@
 #include "../include/arraylist.h"
 #include "../include/fileReader.h"
 #include "../include/hashmap.h"
-using namespace std;
 #include "../include/trie.h"
 #include "../include/Parser.h"
+#include "../include/initialiser.h"
 #include <chrono>
+using namespace std;
 
 
 int main(int argc, char const *argv[])
@@ -15,12 +16,15 @@ int main(int argc, char const *argv[])
     stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
     trie autocomplete = trie();
 
-    fileReader reader = fileReader();
-    reader.indexBooks(&wordIndex, &autocomplete);
+    initialiser initIndex = initialiser();
+    initIndex.getIndex(&wordIndex, &autocomplete);
     auto stop2 = chrono::high_resolution_clock::now();
     auto duration2 = std::chrono::duration_cast<chrono::microseconds>(stop2 - start2);
 
     std::cout << "Duration: " << duration2.count() << " microseconds" << std::endl;
+    cout << "Amount of keys: " << wordIndex.getAllKeys().length << endl;
+    wordIndex.serialize("wordIndex.dat");
+    autocomplete.serialize("autocomplete.dat");
     // Parser parser;
     // trie autoComplete;
     
