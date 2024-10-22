@@ -21,18 +21,21 @@ public:
     // Add an option with a default value
     void addOption(const string& name, const string& description, arraylist<string> defaultValue);
 
+    // Get the value of an option
+    arraylist<string> getOption(const string& name);
+
     // Add a flag (boolean option)
     void addFlag(const string& name, const string& description);
 
     // Add a new book to the data structure
     void addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, trie *autocomplete);
 
-    // Parse arguments
-    void parse(int argc, const char* argv[]);
-
     // Parser Setup
     void parserSetup();
 
+    // Parse arguments
+    void parse(int argc, const char* argv[]);
+    
     // Print help/usage information
     void printHelp();
 
@@ -41,10 +44,6 @@ public:
 
     //autocomplete prefix
     string autoComplete();
-
-    // Get the value of an option
-    arraylist<string> getOption(const string& name);
-
 
 private:
     // Internal Option structure
@@ -62,7 +61,7 @@ private:
             : description(desc), value(val), here(here) {}
     };
     
-    // Store options and positional arguments
+    // Store options in hashmap
     stringhashmap<Option> options = stringhashmap<Option>(20);
 };
 
