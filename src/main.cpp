@@ -22,6 +22,7 @@ int main(int argc, char const *argv[])
         // setup the word index and autocomplete
         stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
         trie autocomplete = trie();
+        cout << "Loading..." << endl;
         if (parser.checkOption("forceSerialise")) {
             fileReader reader = fileReader();
             reader.indexBooks(&wordIndex, &autocomplete);
