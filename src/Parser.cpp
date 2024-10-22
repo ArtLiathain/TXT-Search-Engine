@@ -59,7 +59,9 @@ void Parser::parserSetup() {
 
     // Adding flags
     addFlag("help", "Display help information");
+    addFlag("forceSerialise", "Force serialisation of the index");
     addFlag("exit", "Exit the program");
+    
 }
 
 // Parse arguments

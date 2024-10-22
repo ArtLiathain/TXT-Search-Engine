@@ -22,8 +22,14 @@ int main(int argc, char const *argv[])
         // setup the word index and autocomplete
         stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
         trie autocomplete = trie();
-        fileReader reader = fileReader();
-        reader.indexBooks(&wordIndex, &autocomplete);
+        if (parser.checkOption("forceSerialise")) {
+            fileReader reader = fileReader();
+            reader.indexBooks(&wordIndex, &autocomplete);
+        } else {
+            initialiser init = initialiser();
+            init.getIndex(&wordIndex, &autocomplete);
+        }
+        
 
         while (!parser.checkOption("exit")) {
             string divLine(100, '-');
@@ -93,6 +99,9 @@ int main(int argc, char const *argv[])
             delete[] new_argv;
             
         }
+        cout << "Serialising index and autocomplete..." << endl;
+        wordIndex.serialize("wordIndex");
+        autocomplete.serialize("autocomplete");
         cout << "\nExiting program" << endl;
     }
     
