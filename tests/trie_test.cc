@@ -84,8 +84,8 @@ TEST(trie_test, SerializeAndDeserialize)
 
     t.serialize("trieTest.dat");
 
-    trie restored = trie::deserialize("trieTest.dat");
-    arraylist<std::string> restoredWords = restored.getArrayList();
+    trie* restored = trie::deserialize("trieTest.dat");
+    arraylist<std::string> restoredWords = (*restored).getArrayList();
 
     ASSERT_EQ(words.length, restoredWords.length);
 }

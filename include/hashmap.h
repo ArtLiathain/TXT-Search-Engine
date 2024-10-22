@@ -56,7 +56,7 @@ public:
     arraylist<string> getAllKeys();
     void createHashTable(arraylist<pair<string, V>> keyValuePairs);
     void serialize(const string &filename);
-    static stringhashmap<V> deserialize(const string &filename);
+    static stringhashmap<V>* deserialize(const string &filename);
     stringhashmap<V>& operator=(const stringhashmap<V> &other);
     stringhashmap<V>& operator=(stringhashmap<V> &&other) noexcept;
 };
@@ -228,9 +228,7 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
     {
         if (cnt == n)
         {
-            printf("%s unpositioned\n", curKey.c_str());
             rehash();
-            printf("Rehashed\n");
             cnt = 0;  // Reset the count and tableID after rehash
             continue; // Start the insertion again
         }
@@ -241,7 +239,7 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             pos[i] = hashKey(i + 1, curKey);
             if (hashtable[i][pos[i]].key == curKey)
             {
-                hashtable[i][pos[i]].value = curValue;
+                hashtable[i][pos[i]].value = std::move(curValue);
                 readMutex.unlock();
                 writeMutex.unlock();
                 return;
@@ -256,8 +254,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
             // Insert the new key-value pair
-            hashtable[tableID][pos[tableID]].key = curKey;
-            hashtable[tableID][pos[tableID]].value = curValue;
+            hashtable[tableID][pos[tableID]].key = std::move(curKey);
+            hashtable[tableID][pos[tableID]].value = std::move(curValue);
 
             // Move to the next table and repeat the process with the displaced pair
             curKey = displacedKey;
@@ -268,8 +266,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
         else
         {
             // If the current position is free, insert the key-value pair
-            hashtable[tableID][pos[tableID]].key = curKey;
-            hashtable[tableID][pos[tableID]].value = curValue;
+            hashtable[tableID][pos[tableID]].key = std::move(curKey);
+            hashtable[tableID][pos[tableID]].value = std::move(curValue);
             readMutex.unlock();
             writeMutex.unlock();
             return;
@@ -400,7 +398,6 @@ void stringhashmap<V>::rehash() {
     int oldMAXN = MAXN; // Save the old size
     MAXN *= 2; // Double the size
     KeyValue<string, V>** oldTable = hashtable; // Keep reference to old table
-    cout << "Resized to " << MAXN << " from " << oldMAXN << endl;
 
     // Initialize new hashtable
     hashtable = new KeyValue<string, V>*[ver];
@@ -427,7 +424,7 @@ void stringhashmap<V>::rehash() {
                         pos[k] = hashKey(k + 1, key);
                         if (hashtable[k][pos[k]].key == key)
                         {
-                            hashtable[k][pos[k]].value = value;
+                            hashtable[k][pos[k]].value = std::move(value);
                             inserting = false;
                         }
                     }
@@ -440,8 +437,8 @@ void stringhashmap<V>::rehash() {
                         V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
                         // Insert the new key-value pair
-                        hashtable[tableID][pos[tableID]].key = key;
-                        hashtable[tableID][pos[tableID]].value = value;
+                        hashtable[tableID][pos[tableID]].key = std::move(key);
+                        hashtable[tableID][pos[tableID]].value = std::move(value);
 
                         // Move to the next table and repeat the process with the displaced pair
                         key = displacedKey;
@@ -451,8 +448,8 @@ void stringhashmap<V>::rehash() {
                     else
                     {
                         // If the current position is free, insert the key-value pair
-                        hashtable[tableID][pos[tableID]].key = key;
-                        hashtable[tableID][pos[tableID]].value = value;
+                        hashtable[tableID][pos[tableID]].key = std::move(key);
+                        hashtable[tableID][pos[tableID]].value = std::move(value);
                         inserting = false;
                     }
                 }
@@ -466,6 +463,7 @@ void stringhashmap<V>::rehash() {
 
 template <typename V>
 void stringhashmap<V>::serialize(const string& filename) {
+    cout << "Serializing " << filename << endl;
     readMutex.lock();
     writeMutex.lock();
     std::ofstream file(filename, std::ios::binary);
@@ -522,7 +520,7 @@ void stringhashmap<V>::serialize(const string& filename) {
 
 
 template <typename V>
-stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
+stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
     cout << "deserializing " << filename << endl;
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -533,15 +531,23 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
     int MAXN_read, ver_read;
     file.read(reinterpret_cast<char*>(&MAXN_read), sizeof(MAXN_read));
     file.read(reinterpret_cast<char*>(&ver_read), sizeof(ver_read));
-
+    cout << MAXN_read << endl;
     // Create a new hashmap object with the read MAXN and assign the ver
-    stringhashmap<V> hashmap(MAXN_read);
-    hashmap.ver = ver_read;
+    stringhashmap<V>* hashmap = new stringhashmap<V>(MAXN_read);
+    hashmap->MAXN = MAXN_read;
+    hashmap->ver = ver_read;
+
 
     // Read the pos array
-    file.read(reinterpret_cast<char*>(hashmap.pos), sizeof(int) * ver_read);
+    hashmap->pos = new int[ver_read];
+    file.read(reinterpret_cast<char*>(hashmap->pos), sizeof(int) * ver_read);
 
-    cout << hashmap.pos << endl;
+
+    hashmap->hashtable = new KeyValue<string, V>*[ver_read];
+    for (int i = 0; i < ver_read; i++) {
+        hashmap->hashtable[i] = new KeyValue<string, V>[MAXN_read];  // Allocate memory for each row of the hashtable
+    }
+
     // Read the hashtable contents
     for (int i = 0; i < ver_read; i++) {
         for (int j = 0; j < MAXN_read; j++) {
@@ -558,7 +564,7 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
             file.read(reinterpret_cast<char*>(&has_value), sizeof(bool));
             
             // Set the key in the hashtable
-            hashmap.hashtable[i][j].key = key;
+            hashmap->hashtable[i][j].key = key;
             if (has_value) {
                 // If the value is not null then read the length of the value string
                 size_t length;
@@ -572,9 +578,9 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
                 serialiseArraylist serialiser = serialiseArraylist();
                 arraylist<pair<string, float>> value = serialiser.deserialiseintoArraylist(serializedValue);
                 // Assign the value in the hashtable
-                hashmap.hashtable[i][j].value = value;
+                hashmap->hashtable[i][j].value = value;
             } else {
-                hashmap.hashtable[i][j].value = std::nullopt;
+                hashmap->hashtable[i][j].value = std::nullopt;
             }
         }
     }

@@ -58,8 +58,8 @@ TEST(hashmap_test, serialize)
     float originalValue = map.getValue("key1").get(0).second;
     map.serialize("testdata.dat");
 
-    stringhashmap<arraylist<pair<string, float>>> restored = stringhashmap<arraylist<pair<string, float>>>::deserialize("testdata.dat");
-    float restoredValue = restored.getValue("key1").get(0).second;
+    stringhashmap<arraylist<pair<string, float>>>* restored = stringhashmap<arraylist<pair<string, float>>>::deserialize("testdata.dat");
+    float restoredValue = (*restored).getValue("key1").get(0).second;
 
     ASSERT_EQ(originalValue, restoredValue);
 }
