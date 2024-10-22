@@ -25,6 +25,6 @@ TEST(mergeSort_test, initialise)
 
     for (int i = 1; i < newArray.length; i++)
     {
-        ASSERT_TRUE(newArray.get(i - 1).second <= newArray.get(i).second);
+        ASSERT_TRUE(newArray.get(i - 1).second >= newArray.get(i).second);
     }
 }

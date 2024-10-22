@@ -55,7 +55,6 @@ void fileReader::indexBook(string fileName, stringhashmap<arraylist<pair<string,
             // If skipped word don't increment count
             if (skippedWords.keyExists(mystring))
             {
-
                 continue;
             }
 
@@ -104,18 +103,15 @@ void fileReader::indexBooks(stringhashmap<arraylist<pair<string, float>>> *wordI
 {
     arraylist<string> books = getBooks();
     arraylist<thread> threads = arraylist<thread>();
-    
+
     for (int i = 0; i < books.length; i++)
     {
         thread th1(indexBook, books.get(i), wordIndex, autocomplete);
         threads.insert(std::move(th1));
-        cout << "ADDING THREAD" << endl;
         // indexBook(books.get(i), wordIndex, autocomplete);
     }
-    cout << "THREAD " << threads.length << endl;
     for (int j = 0; j < threads.length; j++)
     {
-        cout << "Joining thread " << books.get(j) << endl;
         if (threads.get(j).joinable())
         {
             threads.get(j).join();
