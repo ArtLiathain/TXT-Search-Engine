@@ -40,6 +40,7 @@ add_executable(
   searchIndex_test.cc
   ../src/searchIndex.cpp
   ../src/fileReader.cpp
+  ../src/trie.cpp
 )
 target_link_libraries(
   searchIndex_test

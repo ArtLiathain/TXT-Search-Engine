@@ -46,7 +46,6 @@ trie::~trie()
 void trie::insert(string word)
 {
     try{
-        cout << "inserting " << word << endl;
         Node *cur = root;
         // Only lowercase words
         for (int j = 0; j < word.length(); j++){
@@ -72,7 +71,6 @@ void trie::insert(string word)
         }
         // Know if this is an inputted word
         cur->endOfWord = true;
-        cout << "end of word " << cur->key << " " << cur->endOfWord << endl;
     }
     catch (const std::out_of_range& e) {
         std::cerr << "Key not found: " << e.what() << std::endl;
