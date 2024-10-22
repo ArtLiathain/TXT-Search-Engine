@@ -34,6 +34,12 @@ TEST(hashmap_test, keyNotPresent)
     ASSERT_THROW(hashmap.getValue("Test1"), std::out_of_range);
 }
 
+TEST(hashmap_test, keyNotPresentAndKeyExistsCalled)
+{
+    stringhashmap<int> hashmap = stringhashmap<int>(2);
+    ASSERT_FALSE(hashmap.keyExists("Test1"));
+}
+
 TEST(hashmap_test, insertAndRemove)
 {
     
