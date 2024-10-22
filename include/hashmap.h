@@ -28,7 +28,8 @@ template <typename V>
 class stringhashmap
 {
 private:
-    mutex mtx;
+    std::mutex readMutex;
+    std::mutex writeMutex;
     // Amount of versions of the hash function. Standard for cuckoo hashing is 2
     int ver; 
     // Array to store possible positions for a key
@@ -175,16 +176,17 @@ stringhashmap<V>& stringhashmap<V>::operator=(stringhashmap<V> &&other) noexcept
 template <typename V>
 V& stringhashmap<V>::getValue(const string &key)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    writeMutex.lock();
     for (int i = 0; i < ver; i++)
     {
         int index = hashKey(i + 1, key);
         if (hashtable[i][index].key == key)
         {
+            writeMutex.unlock();
             return hashtable[i][index].value.value();
         }
     }
-    cout << key << " KEY" << endl;
+    writeMutex.unlock();
     throw std::out_of_range("Key not found in the hash table.");
 }
 
@@ -193,14 +195,17 @@ V& stringhashmap<V>::getValue(const string &key)
 template <typename V>
 bool stringhashmap<V>::keyExists(const string &key)
 {
+    writeMutex.lock();
     for (int i = 0; i < ver; i++)
     {
         int index = hashKey(i + 1, key);
         if (hashtable[i][index].key == key)
         {
+            writeMutex.unlock();
             return true;
         }
     }
+    writeMutex.unlock();
     return false;
 }
 
@@ -214,21 +219,18 @@ bool stringhashmap<V>::keyExists(const string &key)
 template <typename V>
 void stringhashmap<V>::insert(const string &key, const V value, int tableID, int cnt, int n)
 {
+    readMutex.lock();
+    writeMutex.lock();
     string curKey = key;
     V curValue = value;
     
     while (true)
     {
-        std::unique_lock<std::mutex> lock(mtx);
-
         if (cnt == n)
         {
             printf("%s unpositioned\n", curKey.c_str());
-            printf("Cycle present. REHASH.\n");
-            lock.unlock(); // Unlock and lock mutex before and after rehash to avoid deadlock
             rehash();
             printf("Rehashed\n");
-            lock.lock();
             cnt = 0;  // Reset the count and tableID after rehash
             continue; // Start the insertion again
         }
@@ -240,6 +242,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             if (hashtable[i][pos[i]].key == curKey)
             {
                 hashtable[i][pos[i]].value = curValue;
+                readMutex.unlock();
+                writeMutex.unlock();
                 return;
             }
         }
@@ -266,6 +270,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             // If the current position is free, insert the key-value pair
             hashtable[tableID][pos[tableID]].key = curKey;
             hashtable[tableID][pos[tableID]].value = curValue;
+            readMutex.unlock();
+            writeMutex.unlock();
             return;
         }
     }
@@ -287,24 +293,27 @@ void stringhashmap<V>::insert(const string &key, const V value){
 template <typename V>
 void stringhashmap<V>::createHashTable(arraylist<pair<string, V>> keyValuePairs)
 {
-    std::unique_lock<std::mutex> lock(mtx);
+    readMutex.lock();
+    writeMutex.lock();
     int n = keyValuePairs.length;
 
     for (int i = 0; i < n; i++)
     {
-        lock.unlock();
+        readMutex.unlock();
+        writeMutex.unlock();
         insert(keyValuePairs.get(i).first, keyValuePairs.get(i).second, 0, 0, n);
-        lock.lock();
+        readMutex.lock();
+        writeMutex.lock();
     }
-
-    lock.unlock();
+    readMutex.unlock();
+    writeMutex.unlock();
 }
 
 
 /* function to return a list of all the keys in the hashtable*/
 template <typename V>
 arraylist<string> stringhashmap<V>::getAllKeys(){
-    std::lock_guard<std::mutex> lock(mtx);
+    writeMutex.lock();
     arraylist<string> allKeys = arraylist<string>(MAXN);
     for (int i = 0; i < ver; i++){
         for(int j = 0; j < MAXN; j++){
@@ -313,12 +322,14 @@ arraylist<string> stringhashmap<V>::getAllKeys(){
             }
         }
     }
+    writeMutex.unlock();
     return allKeys;
 }
 
 template <typename V>
 void stringhashmap<V>::remove(const string &key){
-    std::lock_guard<std::mutex> lock(mtx);
+    readMutex.lock();
+    writeMutex.lock();
     for (int i = 0; i < ver; i++)
     {
         int index = hashKey(i + 1, key);
@@ -326,16 +337,21 @@ void stringhashmap<V>::remove(const string &key){
         {
             hashtable[i][index].value = nullopt;
             hashtable[i][index].key = "";
+            readMutex.unlock();
+            writeMutex.unlock();
             return;
         }
     }
+    readMutex.unlock();
+    writeMutex.unlock();
 }
 
 /* function to fill hash table with dummy values for initialisation */
 template <typename V>
 void stringhashmap<V>::initTable()
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    readMutex.lock();
+    writeMutex.lock();
     hashtable = new KeyValue<string, V>*[ver]; // Allocate rows for 'ver' tables
     for (int i = 0; i < ver; i++)
     {
@@ -346,33 +362,34 @@ void stringhashmap<V>::initTable()
             hashtable[i][j].value = nullopt; // Initialize to null
         }
     }
+    readMutex.unlock();
+    writeMutex.unlock();
 }
 
 /* Simple hash function for strings
  * function: Which version of the hash function we want to use
  * &key: Reference to the keyword being hashed*/
 template <typename V>
-int stringhashmap<V>::hashKey(int function, const string &key)
-{
-    int hashValue = 0;
-    if (function == 1)
-    {
-        for (char c : key)
-        {
-            hashValue += c; // Simple character sum
+int stringhashmap<V>::hashKey(int function, const std::string &key) {
+    std::size_t hashValue = 0;  // Use size_t for intermediate result to avoid overflow
+
+    if (function == 1) {
+        // Polynomial rolling hash with a small prime number base (e.g., 31)
+        const int base = 31;
+        for (char c : key) {
+            hashValue = (hashValue * base + c) % MAXN;
         }
-        return hashValue % MAXN;
+        return static_cast<int>(hashValue);  // Convert to int at the end
     }
-    else if (function == 2)
-    {
-        for (size_t i = 0; i < key.length(); i++)
-        {
-            hashValue += (i + 1) * key[i]; // Weighted character sum
+    else if (function == 2) {
+        // Similar to the first but with different weighting to reduce collisions
+        const int base = 37;  // Different base to ensure varied hash functions
+        for (std::size_t i = 0; i < key.length(); i++) {
+            hashValue = (hashValue * base + key[i]) % MAXN;
         }
-        return hashValue % MAXN;
+        return static_cast<int>(hashValue);  // Convert to int at the end
     }
-    else
-    {
+    else {
         throw std::invalid_argument("Invalid hash function version");
     }
 }
@@ -380,16 +397,17 @@ int stringhashmap<V>::hashKey(int function, const string &key)
 /*Function to double the size of the hashtable and rehash the current elements to properly populate the new table*/
 template <typename V>
 void stringhashmap<V>::rehash() {
-    std::unique_lock<std::mutex> lock(mtx);
     int oldMAXN = MAXN; // Save the old size
     MAXN *= 2; // Double the size
     KeyValue<string, V>** oldTable = hashtable; // Keep reference to old table
+    cout << "Resized to " << MAXN << " from " << oldMAXN << endl;
 
     // Initialize new hashtable
     hashtable = new KeyValue<string, V>*[ver];
     for (int i = 0; i < ver; i++) {
         hashtable[i] = new KeyValue<string, V>[MAXN];
         for (int j = 0; j < MAXN; j++) {
+            hashtable[i][j].key = "";
             hashtable[i][j].value = nullopt; // Initialize to nullopt
         }
     }
@@ -398,14 +416,48 @@ void stringhashmap<V>::rehash() {
     for (int i = 0; i < ver; i++) {
         for (int j = 0; j < oldMAXN; j++) {
             if (oldTable[i][j].value.has_value()) { // Only rehash if there is a value
-                const string &key = oldTable[i][j].key;
-                const V &value = oldTable[i][j].value.value();
+                string key = oldTable[i][j].key;
+                V value = oldTable[i][j].value.value();
+                bool inserting = true;
+                int tableID = i;
+                while(inserting){
+                    // Check if either of the two possible locations have the key
+                    for (int k = 0; k < ver; k++)
+                    {
+                        pos[k] = hashKey(k + 1, key);
+                        if (hashtable[k][pos[k]].key == key)
+                        {
+                            hashtable[k][pos[k]].value = value;
+                            inserting = false;
+                        }
+                    }
+                
+                    // Check if the current position is occupied
+                    if (hashtable[tableID][pos[tableID]].value.has_value())
+                    {
+                        // Displace the current key-value pair
+                        string displacedKey = hashtable[tableID][pos[tableID]].key;
+                        V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
-                lock.unlock();
-                // Use the insert function to insert the key-value pair into the new table
-                insert(key, value, i, 0, oldMAXN); // Insert into the new hashtable
-                lock.lock();
-            }
+                        // Insert the new key-value pair
+                        hashtable[tableID][pos[tableID]].key = key;
+                        hashtable[tableID][pos[tableID]].value = value;
+
+                        // Move to the next table and repeat the process with the displaced pair
+                        key = displacedKey;
+                        value = displacedValue;
+                        tableID = (tableID + 1) % ver;
+                    }
+                    else
+                    {
+                        // If the current position is free, insert the key-value pair
+                        hashtable[tableID][pos[tableID]].key = key;
+                        hashtable[tableID][pos[tableID]].value = value;
+                        inserting = false;
+                    }
+                }
+            
+        }
         }
         delete[] oldTable[i]; // Clean up old table row
     }
@@ -414,9 +466,12 @@ void stringhashmap<V>::rehash() {
 
 template <typename V>
 void stringhashmap<V>::serialize(const string& filename) {
-    std::lock_guard<std::mutex> lock(mtx);
+    readMutex.lock();
+    writeMutex.lock();
     std::ofstream file(filename, std::ios::binary);
     if (!file.is_open()) {
+        readMutex.unlock();
+        writeMutex.unlock();
         throw std::runtime_error("Error: Failed to open file for writing.");
     }
 
@@ -460,6 +515,8 @@ void stringhashmap<V>::serialize(const string& filename) {
     }
 
     file.close();
+    readMutex.unlock();
+    writeMutex.unlock();
     std::cout << "Object serialized successfully." << std::endl;
 }
 

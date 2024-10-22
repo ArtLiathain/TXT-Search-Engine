@@ -1,8 +1,5 @@
 #include "../include/trie.h"
-#include "../include/hashmap.h"
-#include <iostream>
-#include <unordered_map>
-#include <fstream>
+
 using namespace std;
 
 trie::trie()
