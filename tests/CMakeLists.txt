@@ -41,6 +41,7 @@ add_executable(
   ../src/searchIndex.cpp
   ../src/fileReader.cpp
   ../src/trie.cpp
+  ../src/mergeSort.cpp
 )
 target_link_libraries(
   searchIndex_test
