@@ -14,6 +14,10 @@ cd build
 make
 cd src/
 ./my_executable
+
+OR
+
+source runproject.sh
 ```
 
 ## Adding files to the build
