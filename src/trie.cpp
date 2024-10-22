@@ -191,7 +191,7 @@ void trie::serializeNode(ofstream &file, Node *node){
     }
 }
 
-trie trie::deserialize(const string &filename){
+trie* trie::deserialize(const string &filename){
     cout << "deserializing " << filename << endl;
 
     ifstream file(filename, ios::binary);
@@ -199,9 +199,9 @@ trie trie::deserialize(const string &filename){
         throw std::runtime_error("Error: Failed to open file for reading.");
     }
 
-    trie deserializedTrie;
+    trie* deserializedTrie = new trie();
 
-    deserializedTrie.root = deserializeNode(file);
+    deserializedTrie->root = deserializeNode(file);
 
     file.close();
 
