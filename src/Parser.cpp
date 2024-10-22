@@ -1,14 +1,4 @@
 #include "../include/Parser.h"
-#include "../include/trie.h"
-#include "../include/arraylist.h"
-#include <iostream>
-#include <map>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <filesystem>
-#include <fstream>
-
 using namespace std;
 
 
@@ -57,7 +47,8 @@ void Parser::addBook() {
 
     // Copy the file contents
     dst << src.rdbuf();
-
+    fileReader reader = fileReader();
+    reader.indexBook(filename);
     cout << "Book added to archive: " << newFilePath << endl;
 }
 
@@ -113,8 +104,43 @@ void Parser::listBooks() {
     cout << "Listing top " << getOption("list").get(0) << " books" << endl;
 }
 
-void Parser::searchBook() {
-    cout << "Searching for book with word: " << getOption("search").get(0) << endl;
+arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex) {
+    searchIndex search = searchIndex();
+    stringhashmap<float> searchWordIndex;
+    arraylist<string> searchWords = getOption("search");
+    int i = 0;
+    while (i < searchWords.length) {
+        if (searchWords.get(i) == "OR") {
+            i++;
+            if (searchWords.get(i) == "NOT") {
+                i++;
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                search.orFunc(&searchWordIndex, &notSearch);
+            } else {
+                search.orFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+            }
+        } else if (searchWords.get(i) == "AND") {
+            i++;
+            if (searchWords.get(i) == "NOT") {
+                i++;                
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                search.andFunc(&searchWordIndex, &notSearch);
+            } else {
+                search.andFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+            }
+        } else {
+            if (searchWords.get(i) == "NOT") {
+                i++;
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                search.orFunc(&searchWordIndex, &notSearch);
+            } else {
+                search.orFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+            }
+        }
+        i++;
+    }
+
+    return search.getBookList(&searchWordIndex);
 }
 
 string Parser::autoComplete() {

@@ -1,13 +1,15 @@
 #ifndef PARSER_H
 #define PARSER_H
-#include "../include/arraylist.h"
+#include "./arraylist.h"
+#include "./trie.h"
+#include "./searchIndex.h"
 #include "./hashmap.h"
 #include <iostream>
-#include <map>
-#include <vector>
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <filesystem>
+#include <fstream>
 using namespace std;
 
 class Parser {
@@ -38,7 +40,7 @@ public:
     void listBooks(); 
 
     // Search for a book
-    void searchBook();
+    arraylist<pair<string, float>> searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex);
 
     //autocomplete prefix
     string autoComplete();
