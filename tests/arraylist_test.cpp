@@ -36,7 +36,7 @@ TEST(arraylist_test, array_will_grow)
 TEST(arraylist_test, overall_test)
 {
   arraylist<int> list = arraylist<int>(7);
-for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 10; i++)
   {
     list.insert(i);
   }
@@ -46,5 +46,4 @@ for (int i = 0; i < 10; i++)
   ASSERT_EQ(list.get(3), 3);
   list.remove(3);
   ASSERT_EQ(list.get(8), 9);
-
 }

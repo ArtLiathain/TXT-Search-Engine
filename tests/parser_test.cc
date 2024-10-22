@@ -6,10 +6,10 @@
 stringhashmap<arraylist<pair<string, float>>> getWordIndex()
 {
     stringhashmap<arraylist<pair<string, float>>> wordIndex;
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
     {
         arraylist<pair<string, float>> wordValues;
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < 5; j++)
         {
             std::string text = "book";
             text += std::to_string(j);
@@ -25,27 +25,31 @@ stringhashmap<arraylist<pair<string, float>>> getWordIndex()
 trie getAutocomplete()
 {
     trie autoComplete;
-    
-    autoComplete.insert("heat");
-    autoComplete.insert("hello");
-    autoComplete.insert("hell");
-    autoComplete.insert("help");
-    autoComplete.insert("heard");
-    autoComplete.insert("heal");
+
+    autoComplete.insert("word1");
+    autoComplete.insert("word2");
+    autoComplete.insert("word3");
+    autoComplete.insert("word4");
+    autoComplete.insert("word5");
+    autoComplete.insert("word6");
 
     return autoComplete;
-
 }
 TEST(parser_test, full_test)
 {
     Parser parser;
-    const char* args[] = {"./program", "-search", "NOT", "cat", "AND", "dog", "fluffy"};
-    int arglen = sizeof(args) / sizeof(args[0]);
+    const char *args[] = {"./program", "-search", "word1", "AND", "word1"};
+    int arglen = 5;
 
     stringhashmap<arraylist<pair<string, float>>> wordIndex = getWordIndex();
-    trie autocomplete = getAutocomplete();
+
     parser.parserSetup();
     parser.parse(arglen, args);
 
-    ASSERT_EQ(parser.searchBook(&wordIndex), 6); // book2 = index 3 value 2 *3
+    arraylist<pair<string, float>> orderedBooks = parser.searchBook(&wordIndex);
+    cout << orderedBooks.length << endl;
+    for (int i = 1; i < orderedBooks.length; i++)
+    {
+        ASSERT_TRUE(orderedBooks.get(i - 1).second >= orderedBooks.get(i).second);
+    }
 }

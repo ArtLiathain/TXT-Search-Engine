@@ -14,6 +14,9 @@ mergeSort::~mergeSort()
 // Entrypoint function
 arraylist<pair<string, float>> mergeSort::sortArray(arraylist<pair<string, float>> array)
 {
+    if (array.length == 0) {
+        return arraylist<pair<string, float>>();
+    }
     return breakUp(array, 0, array.length - 1);
 }
 

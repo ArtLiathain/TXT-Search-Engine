@@ -4,27 +4,107 @@
 
 using namespace std;
 
-TEST(mergeSort_test, initialise)
+// Test sorting an already sorted array
+TEST(mergeSort_test, reverseSorted)
 {
     mergeSort merge = mergeSort();
 
-    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(10);
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(5);
     array.insert(pair{"book1", 1});
-    array.insert(pair{"book4", 4});
-    array.insert(pair{"book10", 10});
-    array.insert(pair{"book6", 6});
     array.insert(pair{"book2", 2});
-    array.insert(pair{"book8", 6});
+    array.insert(pair{"book3", 3});
+    array.insert(pair{"book4", 4});
     array.insert(pair{"book5", 5});
-    array.insert(pair{"book3", 3});
-    array.insert(pair{"book3", 3});
-    array.insert(pair{"book7", 6});
-    array.insert(pair{"book9", 9});
 
-    arraylist<pair<string, float>> newArray = merge.sortArray(array);
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
 
-    for (int i = 1; i < newArray.length; i++)
+    for (int i = 1; i < sortedArray.length; i++)
     {
-        ASSERT_TRUE(newArray.get(i - 1).second <= newArray.get(i).second);
+        ASSERT_TRUE(sortedArray.get(i - 1).second >= sortedArray.get(i).second);
+    }
+}
+
+// Test sorting an empty array
+TEST(mergeSort_test, emptyArray)
+{
+    mergeSort merge = mergeSort();
+
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(1);
+
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
+
+    ASSERT_EQ(sortedArray.length, 0);
+}
+
+// Test sorting a single element array
+TEST(mergeSort_test, singleElement)
+{
+    mergeSort merge = mergeSort();
+
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(1);
+    array.insert(pair{"book1", 1});
+
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
+
+    ASSERT_EQ(sortedArray.length, 1);
+    ASSERT_EQ(sortedArray.get(0).second, 1);
+}
+
+// Test sorting an array where all elements have the same value
+TEST(mergeSort_test, sameValues)
+{
+    mergeSort merge = mergeSort();
+
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(5);
+    array.insert(pair{"book1", 2});
+    array.insert(pair{"book2", 2});
+    array.insert(pair{"book3", 2});
+    array.insert(pair{"book4", 2});
+    array.insert(pair{"book5", 2});
+
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
+
+    for (int i = 1; i < sortedArray.length; i++)
+    {
+        ASSERT_TRUE(sortedArray.get(i - 1).second == sortedArray.get(i).second);
+    }
+}
+
+// Test sorting a reverse-sorted array
+TEST(mergeSort_test, alreadySorted)
+{
+    mergeSort merge = mergeSort();
+
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(5);
+    array.insert(pair{"book5", 5});
+    array.insert(pair{"book4", 4});
+    array.insert(pair{"book3", 3});
+    array.insert(pair{"book2", 2});
+    array.insert(pair{"book1", 1});
+
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
+
+    for (int i = 1; i < sortedArray.length; i++)
+    {
+        ASSERT_TRUE(sortedArray.get(i - 1).second >= sortedArray.get(i).second);
+    }
+}
+
+// Test sorting a large array
+TEST(mergeSort_test, largeArray)
+{
+    mergeSort merge = mergeSort();
+
+    arraylist<pair<string, float>> array = arraylist<pair<string, float>>(1000);
+    for (int i = 0; i < 1000; i++)
+    {
+        array.insert(pair{"book" + to_string(i), rand() % 1000});
+    }
+
+    arraylist<pair<string, float>> sortedArray = merge.sortArray(array);
+
+    for (int i = 1; i < sortedArray.length; i++)
+    {
+        ASSERT_TRUE(sortedArray.get(i - 1).second >= sortedArray.get(i).second);
     }
 }
