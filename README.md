@@ -31,3 +31,24 @@ add_executable(<Name of exe> <Name of file>)
 ```
 source testproject.sh
 ```
+
+# Running the Project
+
+Once built, the project can be run from build/src with:
+```
+./my_executable
+```
+
+The following options can be flagged with this command:
+
+| Command          |Parameters                       | Description                                              |
+|------------------|---------------------------------|----------------------------------------------------------|
+| `-search`        |word*, operators {OR, NOT, AND}  | Search for books containing (or excluding) these words.  |
+| `-autocomplete`  |prefix                           | Returns all words starting with the given prefix.        |
+| `-addBook`       |path                             | Adds a book at the given path to the index.              |
+| `-help`          |                                 | Displays all commands with descriptions.                 |
+| `-forceSerialise`|                                 | Deserialises the index and autocomplete.                 |
+| `-exit`          |                                 | Terminates the program.                                  |
+
+After completion, the program will prompt another input
+simply enter a new command (excluding "./my_executable")
