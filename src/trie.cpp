@@ -157,3 +157,81 @@ void trie::getArrayList_rec(stringhashmap<trie::Node *> children, string prefix,
         std::cerr << "Error: " << e.what() << std::endl;
     }
 }
+
+void trie::serialize(const string &filename) {
+    cout << "serializing " << filename << endl;
+    ofstream file(filename, ios::binary);
+    if (!file) {
+        throw runtime_error("Could not open file for writing");
+    }
+
+    // Start serializing from the root node
+    serializeNode(file, root);
+
+    file.close();
+}
+
+void trie::serializeNode(ofstream &file, Node *node){
+    if (node == nullptr) return;
+
+    size_t key_size = node->key.size();
+    file.write(reinterpret_cast<const char *>(&key_size), sizeof(key_size));
+    file.write(node->key.data(), key_size);
+
+    file.write(reinterpret_cast<const char *>(&node->endOfWord), sizeof(bool));
+
+    arraylist<string> childrenKeys = node->children.getAllKeys();
+    size_t num_children = childrenKeys.length;
+    file.write(reinterpret_cast<const char*>(&num_children), sizeof(num_children));
+
+    for(int i = 0; i < num_children; i++){
+        string childKey = childrenKeys.get(i);
+        Node* childNode = node->children.getValue(childKey);
+        serializeNode(file, childNode);
+    }
+}
+
+trie trie::deserialize(const string &filename){
+    cout << "deserializing " << filename << endl;
+
+    ifstream file(filename, ios::binary);
+    if (!file.is_open()) {
+        throw std::runtime_error("Error: Failed to open file for reading.");
+    }
+
+    trie deserializedTrie;
+
+    deserializedTrie.root = deserializeNode(file);
+
+    file.close();
+
+    return deserializedTrie;
+}
+
+trie::Node* trie::deserializeNode(ifstream &file){
+    size_t key_size;
+    file.read(reinterpret_cast<char*>(&key_size), sizeof(key_size));
+
+    // Size the key string to the read size and initialise to all spaces
+    string key(key_size, ' ');
+    // Read the key from the file
+    file.read(key.data(), key_size);
+
+    bool endOfWord;
+    file.read(reinterpret_cast<char*>(&endOfWord), sizeof(bool));
+
+    // Deserialize the number of children
+    size_t num_children;
+    file.read(reinterpret_cast<char*>(&num_children), sizeof(num_children));
+
+    // Create the node and deserialize its children
+    stringhashmap<Node *> children = stringhashmap<Node *>();
+    Node *node = new Node{key, endOfWord, children};
+
+    // Recursively deserialize each child node
+    for (size_t i = 0; i < num_children; ++i) {
+        Node *child_node = deserializeNode(file);
+        node->children.insert(child_node->key, child_node);
+    }
+    return node;
+}
