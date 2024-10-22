@@ -463,7 +463,6 @@ void stringhashmap<V>::rehash() {
 
 template <typename V>
 void stringhashmap<V>::serialize(const string& filename) {
-    cout << "Serializing " << filename << endl;
     readMutex.lock();
     writeMutex.lock();
     std::ofstream file(filename, std::ios::binary);
@@ -514,14 +513,12 @@ void stringhashmap<V>::serialize(const string& filename) {
     file.close();
     readMutex.unlock();
     writeMutex.unlock();
-    std::cout << "Object serialized successfully." << std::endl;
 }
 
 
 
 template <typename V>
 stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
-    cout << "deserializing " << filename << endl;
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         throw std::runtime_error("Error: Failed to open file for reading.");
@@ -531,7 +528,6 @@ stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
     int MAXN_read, ver_read;
     file.read(reinterpret_cast<char*>(&MAXN_read), sizeof(MAXN_read));
     file.read(reinterpret_cast<char*>(&ver_read), sizeof(ver_read));
-    cout << MAXN_read << endl;
     // Create a new hashmap object with the read MAXN and assign the ver
     stringhashmap<V>* hashmap = new stringhashmap<V>(MAXN_read);
     hashmap->MAXN = MAXN_read;
@@ -584,10 +580,8 @@ stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
             }
         }
     }
-    cout << "hashtable deserialized and populated" << endl;
 
     file.close();
-    std::cout << "Object deserialized successfully." << std::endl;
     return hashmap;
 }
 

@@ -159,7 +159,6 @@ void trie::getArrayList_rec(stringhashmap<trie::Node *> children, string prefix,
 }
 
 void trie::serialize(const string &filename) {
-    cout << "serializing " << filename << endl;
     ofstream file(filename, ios::binary);
     if (!file) {
         throw runtime_error("Could not open file for writing");
@@ -192,7 +191,6 @@ void trie::serializeNode(ofstream &file, Node *node){
 }
 
 trie* trie::deserialize(const string &filename){
-    cout << "deserializing " << filename << endl;
 
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
