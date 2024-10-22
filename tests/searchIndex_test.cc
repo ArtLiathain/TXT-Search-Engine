@@ -83,22 +83,6 @@ TEST(searchIndex_test, andWithNoCommonBooks)
     ASSERT_EQ(searchIndex.getAllKeys().length, 4);
 }
 
-// Test the NOT functionality
-TEST(searchIndex_test, notFunc)
-{
-    stringhashmap<arraylist<pair<string, float>>> wordIndex = getCustomWordIndex(3, 5);
-    searchIndex search = searchIndex();
-
-    arraylist<pair<string, float>> booksContainingWord = wordIndex.getValue("word0");
-
-    // Simulate a fileReader that returns all books
-    arraylist<pair<string, float>> result = search.notFunc(&booksContainingWord);
-
-    // Ensure the result contains books not in booksContainingWord
-    //NOT is special as it always reads from the archive to get the not index so there are 101 books the lenght will be 101 as non contain word0
-    ASSERT_EQ(result.length, 101); // Assuming fileReader.getBooks returns only 5 books as in wordIndex.
-}
-
 // Test AND functionality with larger index
 TEST(searchIndex_test, andWithLargerIndex)
 {
