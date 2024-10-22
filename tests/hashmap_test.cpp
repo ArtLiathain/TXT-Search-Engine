@@ -40,6 +40,16 @@ TEST(hashmap_test, keyNotPresentAndKeyExistsCalled)
     ASSERT_FALSE(hashmap.keyExists("Test1"));
 }
 
+TEST(hashmap_test, getAllKeys)
+{
+    stringhashmap<int> hashmap = stringhashmap<int>(1);
+    hashmap.insert("Test1", 42);
+    hashmap.insert("Test2", 52);
+    hashmap.insert("Test3", 12);
+    hashmap.insert("Test4", 72);
+    ASSERT_EQ(hashmap.getAllKeys().length, 4);
+}
+
 TEST(hashmap_test, insertAndRemove)
 {
     
