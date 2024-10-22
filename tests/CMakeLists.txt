@@ -51,6 +51,21 @@ gtest_discover_tests(searchIndex_test)
 
 
 add_executable(
+  parser_test
+  parser_test.cc
+  ../src/searchIndex.cpp
+  ../src/fileReader.cpp
+  ../src/trie.cpp
+  ../src/Parser.cpp
+  ../src/mergeSort.cpp
+)
+target_link_libraries(
+  parser_test
+  GTest::gtest_main
+)
+gtest_discover_tests(parser_test)
+
+add_executable(
   mergeSort_test
   mergeSort_test.cpp
   ../src/mergeSort.cpp

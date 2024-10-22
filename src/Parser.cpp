@@ -1,14 +1,4 @@
 #include "../include/Parser.h"
-#include "../include/trie.h"
-#include "../include/arraylist.h"
-#include <iostream>
-#include <map>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <filesystem>
-#include <fstream>
-
 using namespace std;
 
 
@@ -27,12 +17,11 @@ arraylist<string> Parser::getOption(const string& name) {
     return options.getValue(name).value;
 }
 
-// Add a flag (boolean option)
 void Parser::addFlag(const string& name, const string& description) {
     options.insert(name, Option(description, arraylist<string>(1), true));
 }
 
-void Parser::addBook() {
+void Parser::addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, trie *autocomplete) {
     string filename = getOption("addBook").get(0);
     string path = getOption("addBook").get(1);
     // Create the archive directory if it doesn't exist
@@ -57,16 +46,33 @@ void Parser::addBook() {
 
     // Copy the file contents
     dst << src.rdbuf();
-
+    fileReader reader = fileReader();
+    reader.indexBook(filename, wordIndex, autocomplete);
     cout << "Book added to archive: " << newFilePath << endl;
+}
+
+void Parser::parserSetup() {
+    // Adding options
+    addOption("search", "Search for a book", arraylist<string>(1)); // string
+    addOption("autocomplete", "returns a list of words starting with a given prefix", arraylist<string>(1)); // string
+    addOption("addBook", "Add a book to the archive", arraylist<string>(2)); // string
+
+    // Adding flags
+    addFlag("help", "Display help information");
+    addFlag("exit", "Exit the program");
 }
 
 // Parse arguments
 void Parser::parse(int num_args, const char* arg_array[]) {
+    // reset all option values
+    arraylist<string> keys = options.getAllKeys();
+    for (int i = 0; i < keys.length; i++) {   
+        options.getValue(keys.get(i)).value = arraylist<string>(1);
+        options.getValue(keys.get(i)).inCLI = false;
+    }
     for (int i = 1; i < num_args; ++i) {
         string arg = arg_array[i];
         if (arg[0] == '-') {
-            // It's an option
             string name = arg.substr(1);
             if (options.getValue(name).here) {
                 Option opt = options.getValue(name);
@@ -88,33 +94,89 @@ void Parser::parse(int num_args, const char* arg_array[]) {
     }
 }
 
-void Parser::parserSetup() {
-    // Adding options
-    addOption("list", "List top x books", arraylist<string>(1)); // int
-    addOption("search", "Search for a book", arraylist<string>(1)); // string
-    addOption("autocomplete", "returns a list of words starting with a given prefix", arraylist<string>(1)); // string
-    addOption("addBook", "Add a book to the archive", arraylist<string>(2)); // string
-
-    // Adding flags
-    addFlag("verbose", "Enable verbose output");
-    addFlag("help", "Display help information");
-}
-
 void Parser::printHelp() {
     arraylist<string> keys = options.getAllKeys();
-    for (int i = 0; i < keys.getLength(); i++) {
+    cout << "Below is a list of valid options and their functions:" << endl;
+    for (int i = 0; i < keys.length; i++) {
         string key = keys.get(i);
         Option opt = options.getValue(key);
         cout << "  -" << key << ": " << opt.description << endl;
     }
 }
 
-void Parser::listBooks() {
-    cout << "Listing top " << getOption("list").get(0) << " books" << endl;
-}
 
-void Parser::searchBook() {
-    cout << "Searching for book with word: " << getOption("search").get(0) << endl;
+arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex) {
+    searchIndex search = searchIndex();
+    stringhashmap<float> searchWordIndex;
+    arraylist<string> searchWords = getOption("search");
+    arraylist<pair<string, float>> emptySearch = arraylist<pair<string, float>>(); 
+    int i = 0;
+    // loop through search words
+    while (i < searchWords.length) {
+        // if OR, check if next operator is NOT and search accordingly
+        if (searchWords.get(i) == "OR") {
+            i++;
+            if (searchWords.get(i) == "NOT") {
+                i++;
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.orFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);             
+                    search.orFunc(&searchWordIndex, &notSearch);       
+                }
+                
+            } else {
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.orFunc(&searchWordIndex, &emptySearch);                    
+                }
+            }
+        // if AND, check if next operator is NOT and search accordingly
+        } else if (searchWords.get(i) == "AND") {
+            i++;
+            if (searchWords.get(i) == "NOT") {
+                i++;                
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.andFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);                
+                    search.andFunc(&searchWordIndex, &notSearch);    
+                }
+                
+            } else {
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    search.andFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.andFunc(&searchWordIndex, &emptySearch);                    
+                }
+            }
+        } else {
+            // word is neither OR nor AND, check if next operator is NOT and search accordingly
+            if (searchWords.get(i) == "NOT") {
+                i++; 
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.orFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);           
+                    search.orFunc(&searchWordIndex, &notSearch);         
+                }
+                
+            } else {
+                if (wordIndex->keyExists(searchWords.get(i))) { // check if word exists in index
+                    search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.orFunc(&searchWordIndex, &emptySearch);                    
+                }
+            }
+        }
+        i++;
+    }
+
+    return search.getBookList(&searchWordIndex);
 }
 
 string Parser::autoComplete() {

@@ -1,13 +1,15 @@
 #ifndef PARSER_H
 #define PARSER_H
-#include "../include/arraylist.h"
+#include "./arraylist.h"
+#include "./trie.h"
+#include "./searchIndex.h"
 #include "./hashmap.h"
 #include <iostream>
-#include <map>
-#include <vector>
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <filesystem>
+#include <fstream>
 using namespace std;
 
 class Parser {
@@ -19,33 +21,29 @@ public:
     // Add an option with a default value
     void addOption(const string& name, const string& description, arraylist<string> defaultValue);
 
+    // Get the value of an option
+    arraylist<string> getOption(const string& name);
+
     // Add a flag (boolean option)
     void addFlag(const string& name, const string& description);
 
     // Add a new book to the data structure
-    void addBook();
-
-    // Parse arguments
-    void parse(int argc, const char* argv[]);
+    void addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, trie *autocomplete);
 
     // Parser Setup
     void parserSetup();
 
+    // Parse arguments
+    void parse(int argc, const char* argv[]);
+    
     // Print help/usage information
     void printHelp();
 
-    // List books
-    void listBooks(); 
-
     // Search for a book
-    void searchBook();
+    arraylist<pair<string, float>> searchBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex);
 
     //autocomplete prefix
     string autoComplete();
-
-    // Get the value of an option
-    arraylist<string> getOption(const string& name);
-
 
 private:
     // Internal Option structure
@@ -63,7 +61,7 @@ private:
             : description(desc), value(val), here(here) {}
     };
     
-    // Store options and positional arguments
+    // Store options in hashmap
     stringhashmap<Option> options = stringhashmap<Option>(20);
 };
 

@@ -47,8 +47,8 @@ arraylist<pair<string, float>> mergeSort::merge(arraylist<pair<string, float>> a
     // Loop over until one pointer has has reached their capacity
     while (pointer1 < arr1Size && pointer2 < arr2Size)
     {
-        // insert the lowest value first and increment that sides pointer
-        if (array1.get(pointer1).second < array2.get(pointer2).second)
+        // insert the largest value first and increment that sides pointer
+        if (array1.get(pointer1).second > array2.get(pointer2).second)
         {
 
             newArr.insert(array1.get(pointer1));
