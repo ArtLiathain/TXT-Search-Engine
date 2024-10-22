@@ -7,6 +7,7 @@ python3 downloadBooks.py
 ```
 
 ## Building the project
+Make sure the books are in a folder called archive at root of project
 ```
 cmake --preset default;
 cmake --build --preset default;
