@@ -25,7 +25,7 @@ public:
     void addFlag(const string& name, const string& description);
 
     // Add a new book to the data structure
-    void addBook();
+    void addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, trie *autocomplete);
 
     // Parse arguments
     void parse(int argc, const char* argv[]);
@@ -35,9 +35,6 @@ public:
 
     // Print help/usage information
     void printHelp();
-
-    // List books
-    void listBooks(); 
 
     // Search for a book
     arraylist<pair<string, float>> searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex);

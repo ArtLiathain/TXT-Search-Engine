@@ -22,7 +22,7 @@ void Parser::addFlag(const string& name, const string& description) {
     options.insert(name, Option(description, arraylist<string>(1), true));
 }
 
-void Parser::addBook() {
+void Parser::addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, trie *autocomplete) {
     string filename = getOption("addBook").get(0);
     string path = getOption("addBook").get(1);
     // Create the archive directory if it doesn't exist
@@ -48,12 +48,18 @@ void Parser::addBook() {
     // Copy the file contents
     dst << src.rdbuf();
     fileReader reader = fileReader();
-    reader.indexBook(filename);
+    reader.indexBook(filename, wordIndex, autocomplete);
     cout << "Book added to archive: " << newFilePath << endl;
 }
 
 // Parse arguments
 void Parser::parse(int num_args, const char* arg_array[]) {
+    // reset all option values
+    arraylist<string> keys = options.getAllKeys();
+    for (int i = 0; i < keys.getLength(); i++) {   
+        options.getValue(keys.get(i)).value = arraylist<string>(1);
+        options.getValue(keys.get(i)).inCLI = false;
+    }
     for (int i = 1; i < num_args; ++i) {
         string arg = arg_array[i];
         if (arg[0] == '-') {
@@ -81,18 +87,18 @@ void Parser::parse(int num_args, const char* arg_array[]) {
 
 void Parser::parserSetup() {
     // Adding options
-    addOption("list", "List top x books", arraylist<string>(1)); // int
     addOption("search", "Search for a book", arraylist<string>(1)); // string
     addOption("autocomplete", "returns a list of words starting with a given prefix", arraylist<string>(1)); // string
     addOption("addBook", "Add a book to the archive", arraylist<string>(2)); // string
 
     // Adding flags
-    addFlag("verbose", "Enable verbose output");
     addFlag("help", "Display help information");
+    addFlag("exit", "Exit the program");
 }
 
 void Parser::printHelp() {
     arraylist<string> keys = options.getAllKeys();
+    cout << "Below is a list of valid options and their functions:" << endl;
     for (int i = 0; i < keys.getLength(); i++) {
         string key = keys.get(i);
         Option opt = options.getValue(key);
@@ -100,9 +106,6 @@ void Parser::printHelp() {
     }
 }
 
-void Parser::listBooks() {
-    cout << "Listing top " << getOption("list").get(0) << " books" << endl;
-}
 
 arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex) {
     searchIndex search = searchIndex();

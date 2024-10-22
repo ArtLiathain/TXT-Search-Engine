@@ -9,17 +9,7 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
-    trie autocomplete = trie();
-    fileReader reader = fileReader();
-    reader.indexBooks(&wordIndex, &autocomplete);
-   
     Parser parser;
-    
-    // autocomplete.insert("Kiki");
-    // autocomplete.insert("Kiiiiiiidi");
-    // autocomplete.insert("Cookie");
-
     // Add flags (boolean options)
     parser.parserSetup();
 
@@ -27,30 +17,89 @@ int main(int argc, char const *argv[])
     parser.parse(argc, argv);
 
     // Check the flags and output their status
-    if (parser.checkOption("verbose")) {
-        cout << "Verbose mode is enabled." << endl;
-    }
     if (parser.checkOption("help")) {
         parser.printHelp(); // Display help
-    }
-    if (parser.checkOption("list")) {
-        parser.listBooks(); // List books
-    }
-    if (parser.checkOption("search")) {
-        arraylist<pair<string, float>> results = parser.searchBook(wordIndex); // Search for a book
-        for (int i = 0; i < results.length; i++) {
-            cout << results.get(i).first << " " << results.get(i).second << endl;
+    } else {
+        // setup the word index and autocomplete
+        stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
+        trie autocomplete = trie();
+        fileReader reader = fileReader();
+        reader.indexBooks(&wordIndex, &autocomplete);
+
+        while (!parser.checkOption("exit")) {
+
+            // run parse for search or autocomplete passed through CLI
+            if (parser.checkOption("search")) {
+                arraylist<pair<string, float>> results = parser.searchBook(wordIndex); // Search for a book
+                for (int i = 0; i < results.length; i++) {
+                    if (i%5 == 0 and i != 0) {
+                        cout << "Press any key to display next page of results, press q to quit" << endl;
+                        if (cin.get() == 'q') {
+                            break;
+                        }
+                    }
+                    cout << results.get(i).first << " " << results.get(i).second << endl;
+                }
+            }
+            if (parser.checkOption("autocomplete")) {
+                arraylist<string> results = autocomplete.getArrayList_withPrefix(parser.autoComplete());
+                for (int i = 0; i < results.length; i++) {
+                    if (i%5 == 0 and i != 0) {
+                        cout << "Press any key to display next page of results, press q to quit" << endl;
+                        if (cin.get() == 'q') {
+                            break;
+                        }
+                    }
+                    cout << results.get(i) << endl;
+                }
+            }
+            if (parser.checkOption("addBook")) {
+                parser.addBook(&wordIndex, &autocomplete); // Add a book
+            }
+
+
+            cout << "Program finished. Would you like to search, autocomplete or add a book again? (Y/N)" << endl;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            char choice = cin.get(); 
+            if (choice == 'Y') {
+                parser.printHelp();
+                cout << "Enter new search query: " << endl;
+
+                // Clear the buffer after reading 'Y'
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                // Read the new input
+                string input;
+                getline(cin, input);
+                input = "./my_executable " + input;
+                cout << "Input: " << input << endl;
+                // Split input into arguments
+                vector<string> args;
+                stringstream ss(input);
+                string word;
+                while (ss >> word) {
+                    args.push_back(word);
+                }
+
+                // Create new argv array
+                int new_argc = args.size();
+                const char **new_argv = new const char*[new_argc];
+                for (int i = 0; i < new_argc; ++i) {
+                    new_argv[i] = args[i].c_str();
+                }
+
+                // Re-parse with the new arguments
+                parser.parse(new_argc, new_argv);
+
+                // Clean up memory
+                delete[] new_argv;
+            } else {
+                cout << "Exiting program" << endl;
+                break;
+            }
         }
     }
-    if (parser.checkOption("autocomplete")) {
-        arraylist<string> results = autocomplete.getArrayList_withPrefix(parser.autoComplete());
-        for (int i = 0; i < results.length; i++) {
-            cout << results.get(i) << endl;
-        }
-    }
-    if (parser.checkOption("addBook")) {
-        parser.addBook(); // Add a book
-    }
+    
     // Continue with your program logic
     return 0;
 }
