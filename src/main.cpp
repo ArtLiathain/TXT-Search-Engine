@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
 
             // run parse for search or autocomplete passed through CLI
             if (parser.checkOption("search")) {
-                arraylist<pair<string, float>> results = parser.searchBook(wordIndex); // Search for a book
+                arraylist<pair<string, float>> results = parser.searchBook(&wordIndex); // Search for a book
                 for (int i = 0; i < results.length; i++) {
                     if (i%5 == 0 and i != 0) {
                         cout << "Press any key to display next page of results, press q to quit" << endl;

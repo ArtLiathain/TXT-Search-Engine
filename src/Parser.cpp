@@ -107,7 +107,7 @@ void Parser::printHelp() {
 }
 
 
-arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex) {
+arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex) {
     searchIndex search = searchIndex();
     stringhashmap<float> searchWordIndex;
     arraylist<string> searchWords = getOption("search");
@@ -117,27 +117,27 @@ arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<s
             i++;
             if (searchWords.get(i) == "NOT") {
                 i++;
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
                 search.orFunc(&searchWordIndex, &notSearch);
             } else {
-                search.orFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+                search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
             }
         } else if (searchWords.get(i) == "AND") {
             i++;
             if (searchWords.get(i) == "NOT") {
                 i++;                
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
                 search.andFunc(&searchWordIndex, &notSearch);
             } else {
-                search.andFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+                search.andFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
             }
         } else {
             if (searchWords.get(i) == "NOT") {
                 i++;
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex.getValue(searchWords.get(i)));
+                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
                 search.orFunc(&searchWordIndex, &notSearch);
             } else {
-                search.orFunc(&searchWordIndex, &wordIndex.getValue(searchWords.get(i)));
+                search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
             }
         }
         i++;

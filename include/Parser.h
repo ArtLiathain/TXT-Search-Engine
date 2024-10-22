@@ -37,7 +37,7 @@ public:
     void printHelp();
 
     // Search for a book
-    arraylist<pair<string, float>> searchBook(stringhashmap<arraylist<pair<string, float>>> &wordIndex);
+    arraylist<pair<string, float>> searchBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex);
 
     //autocomplete prefix
     string autoComplete();
