@@ -15,9 +15,9 @@ arraylist<pair<string, float>> serialiseArraylist::deserialiseintoArraylist(stri
     stringstream streamstring(fileInput);  
     string pairStr;
     // read the streamstring until ; store the string into pairStr for processing
-    while (getline(streamstring, pairStr, ';')) {  
+    while (getline(streamstring, pairStr, '|')) {  
         // Find the comma seperator for the pair
-        size_t commaPos = pairStr.find(',');
+        size_t commaPos = pairStr.find('¬');
         // if the comma position exists
         if (commaPos != string::npos) {
             // create the pair from the two substrings
@@ -37,10 +37,10 @@ string serialiseArraylist::serialiseArraylistIntoString(arraylist<pair<string, f
     for (size_t i = 0; i < array.length; ++i)
     {
         //convert array into string , between pairs and ; between values
-        streamstring << array.get(i).first << "," << array.get(i).second;
+        streamstring << array.get(i).first << "¬" << array.get(i).second;
         if (i < array.length - 1)
         {
-            streamstring << ";"; 
+            streamstring << "|"; 
         }
     }
     return streamstring.str();

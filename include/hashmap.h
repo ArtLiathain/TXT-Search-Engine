@@ -509,7 +509,6 @@ void stringhashmap<V>::serialize(const string& filename) {
                 
                 // Serialize the value
                 file.write(serializedValue.c_str(), value_size);
-                cout << "wrote to file" << endl;
             }
         }
     }
@@ -534,7 +533,6 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
     int MAXN_read, ver_read;
     file.read(reinterpret_cast<char*>(&MAXN_read), sizeof(MAXN_read));
     file.read(reinterpret_cast<char*>(&ver_read), sizeof(ver_read));
-    cout << MAXN_read << endl;
 
     // Create a new hashmap object with the read MAXN and assign the ver
     stringhashmap<V> hashmap(MAXN_read);
@@ -550,17 +548,14 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
             // Read the size of the key string
             size_t key_size;
             file.read(reinterpret_cast<char*>(&key_size), sizeof(key_size));
-            std::cout << "key_size: " << key_size << std::endl;
             // Size the key string to the read size and initialise to all spaces
             string key(key_size, ' ');
             // Read the key from the file
             file.read(key.data(), key_size);
-            std::cout << "key: " << key << std::endl;
 
             // Read whether or not the associated value is null
             bool has_value;
             file.read(reinterpret_cast<char*>(&has_value), sizeof(bool));
-            std::cout << "has_value: " << has_value << std::endl;
             
             // Set the key in the hashtable
             hashmap.hashtable[i][j].key = key;
@@ -572,7 +567,6 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
                 string serializedValue(length, ' ');
                 // Read the serialized value from the file
                 file.read(&serializedValue[0], length);
-                cout << "value read with length: " << length << endl;
                 
                 // Convert the string to arraylist
                 serialiseArraylist serialiser = serialiseArraylist();
@@ -580,7 +574,6 @@ stringhashmap<V> stringhashmap<V>::deserialize(const std::string& filename) {
                 // Assign the value in the hashtable
                 hashmap.hashtable[i][j].value = value;
             } else {
-                cout << "No value" << endl;
                 hashmap.hashtable[i][j].value = std::nullopt;
             }
         }
