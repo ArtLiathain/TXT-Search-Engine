@@ -4,19 +4,23 @@
 #include "../include/hashmap.h"
 using namespace std;
 #include "../include/trie.h"
-#include "../include/arraylist.h"
-using namespace std;
-#include "../include/LinkedList.h"
 #include "../include/Parser.h"
+#include <chrono>
+
 
 int main(int argc, char const *argv[])
 {
+
+    auto start2 = chrono::high_resolution_clock::now();
     stringhashmap<arraylist<pair<string, float>>> wordIndex = stringhashmap<arraylist<pair<string, float>>>();
     trie autocomplete = trie();
 
     fileReader reader = fileReader();
     reader.indexBooks(&wordIndex, &autocomplete);
+    auto stop2 = chrono::high_resolution_clock::now();
+    auto duration2 = std::chrono::duration_cast<chrono::microseconds>(stop2 - start2);
 
+    std::cout << "Duration: " << duration2.count() << " microseconds" << std::endl;
     // Parser parser;
     // trie autoComplete;
     
