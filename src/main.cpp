@@ -27,30 +27,34 @@ int main(int argc, char const *argv[])
         reader.indexBooks(&wordIndex, &autocomplete);
 
         while (!parser.checkOption("exit")) {
-
+            string divLine(100, '-');
             // run parse for search or autocomplete passed through CLI
             if (parser.checkOption("search")) {
                 arraylist<pair<string, float>> results = parser.searchBook(&wordIndex); // Search for a book
                 for (int i = 0; i < results.length; i++) {
                     if (i%5 == 0 and i != 0) {
-                        cout << "Press any key to display next page of results, press q to quit" << endl;
+                        cout << divLine << endl;
+                        cout << "\nPress any key to display next page of results, press q to quit" << endl;
                         if (cin.get() == 'q') {
                             break;
                         }
                     }
-                    cout << results.get(i).first << " " << results.get(i).second << endl;
+                    cout << divLine << endl;
+                    cout << i+1 << " | " + results.get(i).first << " " << results.get(i).second << endl;
                 }
             }
             if (parser.checkOption("autocomplete")) {
                 arraylist<string> results = autocomplete.getArrayList_withPrefix(parser.autoComplete());
                 for (int i = 0; i < results.length; i++) {
                     if (i%5 == 0 and i != 0) {
-                        cout << "Press any key to display next page of results, press q to quit" << endl;
+                        cout << divLine << endl;
+                        cout << "\nPress any key to display next page of results, press q to quit" << endl;
                         if (cin.get() == 'q') {
                             break;
                         }
                     }
-                    cout << results.get(i) << endl;
+                    cout << divLine << endl;
+                    cout << i+1 << " | " + results.get(i) << endl;
                 }
             }
             if (parser.checkOption("addBook")) {
@@ -58,46 +62,39 @@ int main(int argc, char const *argv[])
             }
 
 
-            cout << "Program finished. Would you like to search, autocomplete or add a book again? (Y/N)" << endl;
+            cout << "\nProgram finished.\n\n" << endl;
+            parser.printHelp();
+            cout << "\n\nEnter new arguments: " << endl;
+            // Clear the cin buffer
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            char choice = cin.get(); 
-            if (choice == 'Y') {
-                parser.printHelp();
-                cout << "Enter new search query: " << endl;
 
-                // Clear the buffer after reading 'Y'
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-                // Read the new input
-                string input;
-                getline(cin, input);
-                input = "./my_executable " + input;
-                cout << "Input: " << input << endl;
-                // Split input into arguments
-                vector<string> args;
-                stringstream ss(input);
-                string word;
-                while (ss >> word) {
-                    args.push_back(word);
-                }
-
-                // Create new argv array
-                int new_argc = args.size();
-                const char **new_argv = new const char*[new_argc];
-                for (int i = 0; i < new_argc; ++i) {
-                    new_argv[i] = args[i].c_str();
-                }
-
-                // Re-parse with the new arguments
-                parser.parse(new_argc, new_argv);
-
-                // Clean up memory
-                delete[] new_argv;
-            } else {
-                cout << "Exiting program" << endl;
-                break;
+            // Read the new input
+            string input;
+            getline(cin, input);
+            input = "./my_executable " + input;
+            // Split input into arguments
+            arraylist<string> args; 
+            stringstream ss(input);
+            string word;
+            while (ss >> word) {
+                args.insert(word);
             }
+
+            // Create new argv array
+            int new_argc = args.length;
+            const char **new_argv = new const char*[new_argc];
+            for (int i = 0; i < new_argc; ++i) {
+                new_argv[i] = args.get(i).c_str();
+            }
+
+            // Re-parse with the new arguments
+            parser.parse(new_argc, new_argv);
+
+            // Clean up memory
+            delete[] new_argv;
+            
         }
+        cout << "\nExiting program" << endl;
     }
     
     // Continue with your program logic

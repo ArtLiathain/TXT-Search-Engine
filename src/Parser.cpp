@@ -56,7 +56,7 @@ void Parser::addBook(stringhashmap<arraylist<pair<string, float>>> *wordIndex, t
 void Parser::parse(int num_args, const char* arg_array[]) {
     // reset all option values
     arraylist<string> keys = options.getAllKeys();
-    for (int i = 0; i < keys.getLength(); i++) {   
+    for (int i = 0; i < keys.length; i++) {   
         options.getValue(keys.get(i)).value = arraylist<string>(1);
         options.getValue(keys.get(i)).inCLI = false;
     }
@@ -99,7 +99,7 @@ void Parser::parserSetup() {
 void Parser::printHelp() {
     arraylist<string> keys = options.getAllKeys();
     cout << "Below is a list of valid options and their functions:" << endl;
-    for (int i = 0; i < keys.getLength(); i++) {
+    for (int i = 0; i < keys.length; i++) {
         string key = keys.get(i);
         Option opt = options.getValue(key);
         cout << "  -" << key << ": " << opt.description << endl;
@@ -111,33 +111,64 @@ arraylist<pair<string, float>> Parser::searchBook(stringhashmap<arraylist<pair<s
     searchIndex search = searchIndex();
     stringhashmap<float> searchWordIndex;
     arraylist<string> searchWords = getOption("search");
+    arraylist<pair<string, float>> emptySearch = arraylist<pair<string, float>>(); 
     int i = 0;
     while (i < searchWords.length) {
         if (searchWords.get(i) == "OR") {
             i++;
             if (searchWords.get(i) == "NOT") {
                 i++;
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
-                search.orFunc(&searchWordIndex, &notSearch);
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.orFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);             
+                    search.orFunc(&searchWordIndex, &notSearch);       
+                }
+                
             } else {
-                search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.orFunc(&searchWordIndex, &emptySearch);                    
+                }
             }
         } else if (searchWords.get(i) == "AND") {
             i++;
             if (searchWords.get(i) == "NOT") {
                 i++;                
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
-                search.andFunc(&searchWordIndex, &notSearch);
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.andFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);                
+                    search.andFunc(&searchWordIndex, &notSearch);    
+                }
+                
             } else {
-                search.andFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    search.andFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.andFunc(&searchWordIndex, &emptySearch);                    
+                }
             }
         } else {
             if (searchWords.get(i) == "NOT") {
                 i++;
-                arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
-                search.orFunc(&searchWordIndex, &notSearch);
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&wordIndex->getValue(searchWords.get(i)));
+                    search.orFunc(&searchWordIndex, &notSearch);
+                } else {
+                    arraylist<pair<string, float>> notSearch = search.notFunc(&emptySearch);           
+                    search.orFunc(&searchWordIndex, &notSearch);         
+                }
+                
             } else {
-                search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                if (wordIndex->keyExists(searchWords.get(i))) {
+                    search.orFunc(&searchWordIndex, &wordIndex->getValue(searchWords.get(i)));
+                } else {
+                    search.orFunc(&searchWordIndex, &emptySearch);                    
+                }
             }
         }
         i++;

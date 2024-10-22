@@ -19,7 +19,6 @@ public:
     ~arraylist();
     int capacity;
     int length;
-    int getLength() { return length; }
     void insert(T value);
     void insert(T value, int index);
     void remove(int index);
