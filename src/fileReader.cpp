@@ -41,7 +41,7 @@ void fileReader::indexBook(string fileName, stringhashmap<arraylist<pair<string,
             for (int i = 0, len = mystring.size(); i < len; i++)
             {
                 // Remove punctuation
-                if (ispunct(mystring[i]))
+                if (!isalpha(mystring[i]))
                 {
 
                     mystring.erase(i--, 1);
