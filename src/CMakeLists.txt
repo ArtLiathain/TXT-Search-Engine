@@ -6,6 +6,7 @@ set(SOURCE_FILES
     searchIndex.cpp
     serialiseArraylist.cpp
     Parser.cpp
+    initialiser.cpp
 )
 add_executable(my_executable ${SOURCE_FILES})
 
