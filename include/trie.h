@@ -11,7 +11,7 @@ class trie
 public:
     struct Node
     {
-        std::string key;
+        string key;
         bool endOfWord;
         stringhashmap<Node*> children;
 
@@ -32,7 +32,7 @@ public:
         }
     };
 
-    void insert(std::string value);
+    void insert(string value);
     trie(/* args */);
     trie(const trie &other);
     trie(trie &&other) noexcept;

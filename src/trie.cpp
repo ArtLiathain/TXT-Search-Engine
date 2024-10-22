@@ -159,13 +159,13 @@ void trie::getArrayList_rec(stringhashmap<trie::Node *> children, string prefix,
 }
 
 void trie::serialize(const string &filename) {
-    cout << "serializing " << filename << endl;
+    cout << "Serializing " << filename << endl;
     ofstream file(filename, ios::binary);
     if (!file) {
         throw runtime_error("Could not open file for writing");
     }
 
-    // Start serializing from the root node
+    // Start serializing recursively from the root node
     serializeNode(file, root);
 
     file.close();
@@ -174,16 +174,21 @@ void trie::serialize(const string &filename) {
 void trie::serializeNode(ofstream &file, Node *node){
     if (node == nullptr) return;
 
+    // Store the size of the key string
     size_t key_size = node->key.size();
     file.write(reinterpret_cast<const char *>(&key_size), sizeof(key_size));
+    // Store the key
     file.write(node->key.data(), key_size);
 
+    // Store whether current node could be the end of a word
     file.write(reinterpret_cast<const char *>(&node->endOfWord), sizeof(bool));
 
     arraylist<string> childrenKeys = node->children.getAllKeys();
+    // Store the number of children
     size_t num_children = childrenKeys.length;
     file.write(reinterpret_cast<const char*>(&num_children), sizeof(num_children));
 
+    // For each of the children, serialize them
     for(int i = 0; i < num_children; i++){
         string childKey = childrenKeys.get(i);
         Node* childNode = node->children.getValue(childKey);
@@ -192,7 +197,7 @@ void trie::serializeNode(ofstream &file, Node *node){
 }
 
 trie* trie::deserialize(const string &filename){
-    cout << "deserializing " << filename << endl;
+    cout << "Deserializing " << filename << endl;
 
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
@@ -201,6 +206,7 @@ trie* trie::deserialize(const string &filename){
 
     trie* deserializedTrie = new trie();
 
+    // Recursively deserialize the nodes starting from the root
     deserializedTrie->root = deserializeNode(file);
 
     file.close();
@@ -209,6 +215,7 @@ trie* trie::deserialize(const string &filename){
 }
 
 trie::Node* trie::deserializeNode(ifstream &file){
+    // Get the size of the key string
     size_t key_size;
     file.read(reinterpret_cast<char*>(&key_size), sizeof(key_size));
 
@@ -217,6 +224,7 @@ trie::Node* trie::deserializeNode(ifstream &file){
     // Read the key from the file
     file.read(key.data(), key_size);
 
+    // Deserialize whether can be an end of word or not
     bool endOfWord;
     file.read(reinterpret_cast<char*>(&endOfWord), sizeof(bool));
 

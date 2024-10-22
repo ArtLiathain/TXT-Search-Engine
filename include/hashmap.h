@@ -7,8 +7,8 @@
 #include <optional>
 
 #include <vector>
-#include <utility> // For std::pair
-#include <string>  // For std::string
+#include <utility> 
+#include <string>  
 
 #include <mutex>
 
@@ -28,8 +28,8 @@ template <typename V>
 class stringhashmap
 {
 private:
-    std::mutex readMutex;
-    std::mutex writeMutex;
+    mutex readMutex;
+    mutex writeMutex;
     // Amount of versions of the hash function. Standard for cuckoo hashing is 2
     int ver; 
     // Array to store possible positions for a key
@@ -91,7 +91,7 @@ stringhashmap<V>::stringhashmap(const stringhashmap<V> &other) {
     MAXN = other.MAXN;
     ver = other.ver;
     pos = new int[ver];  
-    std::copy(other.pos, other.pos + ver, pos);  
+    copy(other.pos, other.pos + ver, pos);  
 
     hashtable = new KeyValue<string, V>*[ver];  // Allocate new hashtable
     for (int i = 0; i < ver; ++i) {
@@ -119,7 +119,7 @@ stringhashmap<V>& stringhashmap<V>::operator=(const stringhashmap<V> &other) {
     MAXN = other.MAXN;
     ver = other.ver;
     pos = new int[ver];  
-    std::copy(other.pos, other.pos + ver, pos);  
+    copy(other.pos, other.pos + ver, pos);  
 
     hashtable = new KeyValue<string, V>*[ver];  // Allocate new hashtable
     for (int i = 0; i < ver; ++i) {
@@ -187,7 +187,7 @@ V& stringhashmap<V>::getValue(const string &key)
         }
     }
     writeMutex.unlock();
-    throw std::out_of_range("Key not found in the hash table.");
+    throw out_of_range("Key not found in the hash table.");
 }
 
 /* function to see if a key exists in the table
@@ -239,7 +239,7 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             pos[i] = hashKey(i + 1, curKey);
             if (hashtable[i][pos[i]].key == curKey)
             {
-                hashtable[i][pos[i]].value = std::move(curValue);
+                hashtable[i][pos[i]].value = move(curValue);
                 readMutex.unlock();
                 writeMutex.unlock();
                 return;
@@ -254,8 +254,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
             V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
             // Insert the new key-value pair
-            hashtable[tableID][pos[tableID]].key = std::move(curKey);
-            hashtable[tableID][pos[tableID]].value = std::move(curValue);
+            hashtable[tableID][pos[tableID]].key = move(curKey);
+            hashtable[tableID][pos[tableID]].value = move(curValue);
 
             // Move to the next table and repeat the process with the displaced pair
             curKey = displacedKey;
@@ -266,8 +266,8 @@ void stringhashmap<V>::insert(const string &key, const V value, int tableID, int
         else
         {
             // If the current position is free, insert the key-value pair
-            hashtable[tableID][pos[tableID]].key = std::move(curKey);
-            hashtable[tableID][pos[tableID]].value = std::move(curValue);
+            hashtable[tableID][pos[tableID]].key = move(curKey);
+            hashtable[tableID][pos[tableID]].value = move(curValue);
             readMutex.unlock();
             writeMutex.unlock();
             return;
@@ -368,8 +368,8 @@ void stringhashmap<V>::initTable()
  * function: Which version of the hash function we want to use
  * &key: Reference to the keyword being hashed*/
 template <typename V>
-int stringhashmap<V>::hashKey(int function, const std::string &key) {
-    std::size_t hashValue = 0;  // Use size_t for intermediate result to avoid overflow
+int stringhashmap<V>::hashKey(int function, const string &key) {
+    size_t hashValue = 0;  // Use size_t for intermediate result to avoid overflow
 
     if (function == 1) {
         // Polynomial rolling hash with a small prime number base (e.g., 31)
@@ -382,13 +382,13 @@ int stringhashmap<V>::hashKey(int function, const std::string &key) {
     else if (function == 2) {
         // Similar to the first but with different weighting to reduce collisions
         const int base = 37;  // Different base to ensure varied hash functions
-        for (std::size_t i = 0; i < key.length(); i++) {
+        for (size_t i = 0; i < key.length(); i++) {
             hashValue = (hashValue * base + key[i]) % MAXN;
         }
         return static_cast<int>(hashValue);  // Convert to int at the end
     }
     else {
-        throw std::invalid_argument("Invalid hash function version");
+        throw invalid_argument("Invalid hash function version");
     }
 }
 
@@ -424,7 +424,7 @@ void stringhashmap<V>::rehash() {
                         pos[k] = hashKey(k + 1, key);
                         if (hashtable[k][pos[k]].key == key)
                         {
-                            hashtable[k][pos[k]].value = std::move(value);
+                            hashtable[k][pos[k]].value = move(value);
                             inserting = false;
                         }
                     }
@@ -437,8 +437,8 @@ void stringhashmap<V>::rehash() {
                         V displacedValue = hashtable[tableID][pos[tableID]].value.value();
 
                         // Insert the new key-value pair
-                        hashtable[tableID][pos[tableID]].key = std::move(key);
-                        hashtable[tableID][pos[tableID]].value = std::move(value);
+                        hashtable[tableID][pos[tableID]].key = move(key);
+                        hashtable[tableID][pos[tableID]].value = move(value);
 
                         // Move to the next table and repeat the process with the displaced pair
                         key = displacedKey;
@@ -448,8 +448,8 @@ void stringhashmap<V>::rehash() {
                     else
                     {
                         // If the current position is free, insert the key-value pair
-                        hashtable[tableID][pos[tableID]].key = std::move(key);
-                        hashtable[tableID][pos[tableID]].value = std::move(value);
+                        hashtable[tableID][pos[tableID]].key = move(key);
+                        hashtable[tableID][pos[tableID]].value = move(value);
                         inserting = false;
                     }
                 }
@@ -466,11 +466,11 @@ void stringhashmap<V>::serialize(const string& filename) {
     cout << "Serializing " << filename << endl;
     readMutex.lock();
     writeMutex.lock();
-    std::ofstream file(filename, std::ios::binary);
+    ofstream file(filename, ios::binary);
     if (!file.is_open()) {
         readMutex.unlock();
         writeMutex.unlock();
-        throw std::runtime_error("Error: Failed to open file for writing.");
+        throw runtime_error("Error: Failed to open file for writing.");
     }
 
     // Write the basic metadata
@@ -514,24 +514,23 @@ void stringhashmap<V>::serialize(const string& filename) {
     file.close();
     readMutex.unlock();
     writeMutex.unlock();
-    std::cout << "Object serialized successfully." << std::endl;
+    cout << "Object serialized successfully." << endl;
 }
 
 
 
 template <typename V>
-stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
-    cout << "deserializing " << filename << endl;
-    std::ifstream file(filename, std::ios::binary);
+stringhashmap<V>* stringhashmap<V>::deserialize(const string& filename) {
+    cout << "Deserializing " << filename << endl;
+    ifstream file(filename, ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("Error: Failed to open file for reading.");
+        throw runtime_error("Error: Failed to open file for reading.");
     }
 
     // Read the metadata (MAXN and ver)
     int MAXN_read, ver_read;
     file.read(reinterpret_cast<char*>(&MAXN_read), sizeof(MAXN_read));
     file.read(reinterpret_cast<char*>(&ver_read), sizeof(ver_read));
-    cout << MAXN_read << endl;
     // Create a new hashmap object with the read MAXN and assign the ver
     stringhashmap<V>* hashmap = new stringhashmap<V>(MAXN_read);
     hashmap->MAXN = MAXN_read;
@@ -544,12 +543,10 @@ stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
 
 
     hashmap->hashtable = new KeyValue<string, V>*[ver_read];
-    for (int i = 0; i < ver_read; i++) {
-        hashmap->hashtable[i] = new KeyValue<string, V>[MAXN_read];  // Allocate memory for each row of the hashtable
-    }
 
     // Read the hashtable contents
     for (int i = 0; i < ver_read; i++) {
+        hashmap->hashtable[i] = new KeyValue<string, V>[MAXN_read];  // Allocate memory for each row of the hashtable
         for (int j = 0; j < MAXN_read; j++) {
             // Read the size of the key string
             size_t key_size;
@@ -580,14 +577,14 @@ stringhashmap<V>* stringhashmap<V>::deserialize(const std::string& filename) {
                 // Assign the value in the hashtable
                 hashmap->hashtable[i][j].value = value;
             } else {
-                hashmap->hashtable[i][j].value = std::nullopt;
+                hashmap->hashtable[i][j].value = nullopt;
             }
         }
     }
-    cout << "hashtable deserialized and populated" << endl;
+    cout << "Hashtable deserialized and populated" << endl;
 
     file.close();
-    std::cout << "Object deserialized successfully." << std::endl;
+    cout << "Object deserialized successfully." << endl;
     return hashmap;
 }
 
